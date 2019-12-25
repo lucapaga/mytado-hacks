@@ -1,0 +1,40 @@
+#!/bin/bash
+
+. ./00.variables.sh
+SESSION_NAME=$(cat ${WORKDIR}/${SESSION_FILENAME})
+BEARER_TOKEN=$(cat ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${OAUTH_ACCESS_TOKEN})
+
+TADO_HOME_ID=$(cat ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_DATA_HOME_ID})
+
+NR_OF_ZONES=$(jq ". | length" ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_ZONES_JSON_RESULT})
+zone_idx=0
+
+echo "ZONE_NAME;TEMP_TIMESTAMP;TEMP_VALUE;HUMIDITY_TIMESTAMP;HUMIDITY_VALUE" > ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_DATA_CSV}
+
+for aZone in $(seq 1 1 ${NR_OF_ZONES})
+do
+    echo "Processing zone #${aZone}"
+    curl "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${aZone}/state" \
+         -H "Authorization: Bearer ${BEARER_TOKEN}" \
+         -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${aZone}.json
+
+    let "zone_idx=aZone-1"
+    echo "zone idx = ${zone_idx}"
+
+    ZONE_NAME=$(jq ".[${zone_idx}].name" ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_ZONES_JSON_RESULT})
+    TEMP_TIME=$(jq ".sensorDataPoints.insideTemperature.timestamp" ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${aZone}.json)
+    TEMP_CELSIUS=$(jq ".sensorDataPoints.insideTemperature.celsius" ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${aZone}.json)
+    HUMID_TIME=$(jq ".sensorDataPoints.humidity.timestamp" ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${aZone}.json)
+    HUMID_PERC=$(jq ".sensorDataPoints.humidity.percentage" ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${aZone}.json)
+
+    echo "${ZONE_NAME};${TEMP_TIME};${TEMP_CELSIUS};${HUMID_TIME};${HUMID_PERC}" >> ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_DATA_CSV}
+done
+
+exit 0
+
+echo "invoking uri >${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/weather<"
+curl "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/weather" \
+     -H "Authorization: Bearer ${BEARER_TOKEN}" \
+     -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_WEATHER_JSON_RESULT}
+
+#jq .homeId ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PROFILE_JSON_RESULT} > ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_DATA_HOME_ID}
