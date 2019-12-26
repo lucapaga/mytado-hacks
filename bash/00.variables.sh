@@ -33,6 +33,8 @@ TADO_API_PERZONE_ACTIVE_TIMETABLE_JSON_RESULT_POSTFIX=active_timetable
 TADO_API_PERZONE_SCHEDULE_JSON_RESULT_PREFIX=tado_api_home_zone_schedule
 TADO_API_WEATHER_JSON_RESULT=tado_api_home_weather.json
 
+TADO_API_PLOTDATA_JSON_RESULT_PREFIX=tado_api_plotdata_forzone
+
 TADO_DATA_CSV=tado_data.csv
 
 TADO_DATA_HOME_ID=tado_home_id.dat
