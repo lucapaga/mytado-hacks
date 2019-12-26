@@ -17,7 +17,7 @@ echo ${CSV_HEADER} > ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_DATA
 for aZone in $(seq 1 1 ${NR_OF_ZONES})
 do
     echo "Processing zone #${aZone}"
-    curl "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${aZone}/state" \
+    curl -s "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${aZone}/state" \
          -H "Authorization: Bearer ${BEARER_TOKEN}" \
          -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${aZone}.json
 

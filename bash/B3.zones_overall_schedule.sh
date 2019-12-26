@@ -24,9 +24,9 @@ do
     do
         echo "Processing timetable #${aTimetable} ..."
 
-        curl "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${aZone}/schedule/timetables/${aTimetable}/blocks" \
-            -H "Authorization: Bearer ${BEARER_TOKEN}" \
-            -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_SCHEDULE_JSON_RESULT_PREFIX}_Z${aZone}_TT${aTimetable}.json
+        curl -s "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${aZone}/schedule/timetables/${aTimetable}/blocks" \
+             -H "Authorization: Bearer ${BEARER_TOKEN}" \
+             -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_SCHEDULE_JSON_RESULT_PREFIX}_Z${aZone}_TT${aTimetable}.json
 
     done
 done

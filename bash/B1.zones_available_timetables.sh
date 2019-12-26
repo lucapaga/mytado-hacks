@@ -17,7 +17,7 @@ zone_idx=0
 for aZone in $(seq 1 1 ${NR_OF_ZONES})
 do
     echo "Processing zone #${aZone}"
-    curl "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${aZone}/schedule/timetables" \
+    curl -s "${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${aZone}/schedule/timetables" \
          -H "Authorization: Bearer ${BEARER_TOKEN}" \
          -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${aZone}_${TADO_API_PERZONE_TIMETABLES_JSON_RESULT_POSTFIX}.json
 
