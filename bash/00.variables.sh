@@ -39,3 +39,5 @@ TADO_API_PLOTDATA_JSON_RESULT_PREFIX=tado_api_plotdata_forzone
 TADO_DATA_CSV=tado_data.csv
 
 TADO_DATA_HOME_ID=tado_home_id.dat
+
+INTELLIGENT_TUNER_LOG_CSV=intelligent_tuner_log.csv
