@@ -2,6 +2,10 @@
 
 . ./00.variables.sh
 
+DO_EXECUTE_CURLZ=true
+CURL_VERBOSITY=-v #verbose
+#CURL_VERBOSITY=-s #silent
+
 # ----- [ MANDATORY ] -----
 OVERLAY_COMMAND=${1}
 HOME_ID=${2}
@@ -64,11 +68,12 @@ then
     if [ "${DO_EXECUTE_CURLZ}" == "true" ]
     then
         # -d @${OVERLAY_SETTING_TEMPLATE_FILE_PATH} \
-        curl -s -X PUT \
+        curl ${CURL_VERBOSITY} \
+                -X PUT \
                 -H "Authorization: Bearer ${BEARER_TOKEN}" \
-                -H "Content-Type: application/json" \
+                -H "Content-Type: application/json;charset=UTF-8" \
                 -d ${CURL_COMMAND_PAYLOAD} \
-                -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${TADO_OVERLAY_SET_JSON_RESULT_PREFIX}_${ZONE_ID}_$(date +"%Y%d%m_%H%M%S").json\
+                -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${TADO_OVERLAY_SET_JSON_RESULT_PREFIX}_${ZONE_ID}_SET_$(date +"%Y%d%m_%H%M%S").json \
                 ${TADO_API_HOME_DETAILS_BASE_URI}/${HOME_ID}/zones/${ZONE_ID}/overlay
     fi
 
@@ -78,11 +83,14 @@ then
 
     if [ "${DO_EXECUTE_CURLZ}" == "true" ]
     then
-        curl -s -X DELETE \
+        curl ${CURL_VERBOSITY} \
+                -X DELETE \
                 -H "Authorization: Bearer ${BEARER_TOKEN}" \
+                -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${TADO_OVERLAY_SET_JSON_RESULT_PREFIX}_${ZONE_ID}_UNSET_$(date +"%Y%d%m_%H%M%S").json \
                 ${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${TH_ZONE}/overlay
     fi
 else
     echo "*** ERROR: unrecognized command ('${OVERLAY_COMMAND}'), use 'SET' or 'UNSET' only"
     exit 127
 fi
+

@@ -2,14 +2,24 @@
 
 . ./00.variables.sh
 
-LOG_SEPARATOR_MAJOR="*************************************************************"
-LOG_SEPARATOR_MINOR="-------------------------------------------------------------"
+# --------- [ CONFIGURATIONS ] ---------
+TH_ZONE=5
+OVERLAY_TEMP_CELSIUS=21.00
+OVERLAY_TEMP_FAHRENHEIT=69.80
+OVERLAY_DURATION=1800
 
-DO_GET_REAL_DATA=false
-DO_CREATE_NEW_SESSION=false
+ROOM1_ZONE=2
+ROOM_TEMPERATURE_MAX_DIFFERENTIAL=100 # 100 = 1 celsius
+
+DO_GET_REAL_DATA=true
+DO_CREATE_NEW_SESSION=true
 
 DO_CREATE_OVERLAYS=true
-OVERLAY_SETTING_TEMPLATE_FILE_PATH=./F1B.add_overlay_payload_template.json
+OVERLAY_SETTING_TEMPLATE_FILE_PATH=./F1B.add_overlay_payload_template_v2.json
+# --------- [ end CONFIGURATIONS ] ---------
+
+LOG_SEPARATOR_MAJOR="*************************************************************"
+LOG_SEPARATOR_MINOR="-------------------------------------------------------------"
 
 #INTELLIGENT_TUNER_LOG_CSV_FILE_PATH=${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${INTELLIGENT_TUNER_LOG_CSV}
 INTELLIGENT_TUNER_LOG_CSV_FILE_PATH=${WORKDIR}/${INTELLIGENT_TUNER_LOG_CSV}
@@ -40,16 +50,10 @@ then
      ./B2.zones_active_timetable.sh
 
      echo "Data collected!"
+else
+     TADO_HOME_ID=$(cat ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_DATA_HOME_ID})
+     echo "Working on home '${TADO_HOME_ID}'"
 fi
-
-# --------- [ CONFIGURATIONS ] ---------
-TH_ZONE=5
-OVERLAY_TEMP_CELSIUS=21.00
-OVERLAY_TEMP_FAHRENHEIT=69.80
-OVERLAY_DURATION=1800
-
-ROOM1_ZONE=2
-ROOM_TEMPERATURE_MAX_DIFFERENTIAL=100
 
 
 # --------- [ SITUATION ] ---------
@@ -60,6 +64,7 @@ TH_HEATING_PERCENTAGE="${TH_HEATING_PERCENTAGE}0000"
 TH_HEATING_PERCENTAGE=${TH_HEATING_PERCENTAGE:0:4}
 
 TH_HEATING_SETTING=$(jq -r .setting.power ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json)
+#TH_HEATING_SETTING="OFF"
 
 TH_HEATING_HAS_OVERLAY=$(jq -r .overlay ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json)
 if [ "${TH_HEATING_HAS_OVERLAY}" == "null" ]
@@ -135,16 +140,28 @@ then
                then
                     echo "Thermo is currently OFF, creating overlay for the thermostat to heat on"
 
-                    ./A9.set_overlay.sh SET \
-                                        ${TADO_HOME_ID} \
-                                        ${TH_ZONE} \
-                                        ${OVERLAY_SETTING_TEMPLATE_FILE_PATH} \
-                                        ${OVERLAY_TEMP_CELSIUS} \
-                                        ${OVERLAY_TEMP_FAHRENHEIT} \
-                                        ${OVERLAY_DURATION}
+                    A9_RETVAL=0
+                    if [ "${DO_CREATE_OVERLAYS}" == "true" ]
+                    then
+                         ./A9.set_overlay.sh SET \
+                                             ${TADO_HOME_ID} \
+                                             ${TH_ZONE} \
+                                             ${OVERLAY_SETTING_TEMPLATE_FILE_PATH} \
+                                             ${OVERLAY_TEMP_CELSIUS} \
+                                             ${OVERLAY_TEMP_FAHRENHEIT} \
+                                             ${OVERLAY_DURATION}
 
-                    CSV_ACTION_CODE=20
-                    CSV_ACTION_DESCRIPTION="ADD OVERLAY TO START THERMO"
+                         A9_RETVAL=$?
+                    fi
+
+                    if [ ${A9_RETVAL} -eq 0 ]
+                    then
+                         CSV_ACTION_CODE=20
+                         CSV_ACTION_DESCRIPTION="ADD OVERLAY TO START THERMO"
+                    else
+                         CSV_ACTION_CODE=38
+                         CSV_ACTION_DESCRIPTION="ERROR WHEN SETTING OVERLAY: ${A9_RETVAL}"
+                    fi
                else
                     echo "Thermo is already running, just letting it do its job!"
                     CSV_ACTION_CODE=10
@@ -156,14 +173,24 @@ then
                then
                     echo "Removing overlay that forced thermo to heat on"
 
-                    ./A9.set_overlay.sh UNSET \
-                                        ${TADO_HOME_ID} \
-                                        ${TH_ZONE}
+                    A9_RETVAL=0
+                    if [ "${DO_CREATE_OVERLAYS}" == "true" ]
+                    then
+                         ./A9.set_overlay.sh UNSET \
+                                             ${TADO_HOME_ID} \
+                                             ${TH_ZONE}
 
-                    echo $?
+                         A9_RETVAL=$?
+                    fi
 
-                    CSV_ACTION_CODE=29
-                    CSV_ACTION_DESCRIPTION="REMOVING OVERLAY ON THERMO"
+                    if [ ${A9_RETVAL} -eq 0 ]
+                    then
+                         CSV_ACTION_CODE=29
+                         CSV_ACTION_DESCRIPTION="REMOVING OVERLAY ON THERMO"
+                    else
+                         CSV_ACTION_CODE=39
+                         CSV_ACTION_DESCRIPTION="ERROR WHEN REMOVING OVERLAY: ${A9_RETVAL}"
+                    fi
                else
                     echo "Just keep the thermo going its way"
                     CSV_ACTION_CODE=11
@@ -182,7 +209,9 @@ then
      echo "appending log to file"
 else
      echo "creating log file"
-     echo "CSV_TS;TH_HEATING_PERCENTAGE;TH_HEATING_SETTING;TH_HEATING_HAS_OVERLAY;ROOM1_CURRENT_TEMPERATURE;ROOM1_TARGET_TEMPERATURE;ROOM1_HEATING_PERCENTAGE;ROOM1_HEATING_SETTING;CSV_ACTION_CODE;CSV_ACTION_DESCRIPTION" > ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH}
+     echo "CSV_TS;TH_HEATING_PERCENTAGE;TH_HEATING_SETTING;TH_HEATING_HAS_OVERLAY;ROOM1_CURRENT_TEMPERATURE;ROOM1_TARGET_TEMPERATURE;ROOM1_HEATING_PERCENTAGE;ROOM1_HEATING_SETTING;MAX_DIFFERENTIAL;CSV_ACTION_CODE;CSV_ACTION_DESCRIPTION" > ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH}
 fi
 
-echo "${CSV_TS};${TH_HEATING_PERCENTAGE};${TH_HEATING_SETTING};${TH_HEATING_HAS_OVERLAY};${ROOM1_CURRENT_TEMPERATURE};${ROOM1_TARGET_TEMPERATURE};${ROOM1_HEATING_PERCENTAGE};${ROOM1_HEATING_SETTING};${CSV_ACTION_CODE};\"${CSV_ACTION_DESCRIPTION}\"" >> ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH}
+echo "${CSV_TS};${TH_HEATING_PERCENTAGE};${TH_HEATING_SETTING};${TH_HEATING_HAS_OVERLAY};${ROOM1_CURRENT_TEMPERATURE};${ROOM1_TARGET_TEMPERATURE};${ROOM1_HEATING_PERCENTAGE};${ROOM1_HEATING_SETTING};${ROOM_TEMPERATURE_MAX_DIFFERENTIAL};${CSV_ACTION_CODE};\"${CSV_ACTION_DESCRIPTION}\"" >> ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH}
+
+rm -rf ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}
