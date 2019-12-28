@@ -15,3 +15,6 @@
 ./A3.zones.sh
 ./A4.weather.sh
 ./A5.get_data.sh #${TH_ZONE} ${ROOM1_ZONE}
+
+SESSION_NAME=$(cat ${WORKDIR}/${SESSION_FILENAME})
+rm -rf ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}
