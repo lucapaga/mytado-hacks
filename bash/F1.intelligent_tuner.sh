@@ -2,20 +2,35 @@
 
 . ./00.variables.sh
 
+THERMOSTAT_ZONE=${1}
+if [[ "${THERMOSTAT_ZONE}" == "" || ${THERMOSTAT_ZONE} -le 0 ]]
+then
+     echo "Thermostat Zone not set, default is 5"
+     THERMOSTAT_ZONE=5
+fi
+
+R1_ZONE=${2}
+if [[ "${R1_ZONE}" == "" || ${R1_ZONE} -le 0 ]]
+then
+     echo "ROOM 1 Zone not set, default is 2"
+     R1_ZONE=2
+fi
+
 # --------- [ CONFIGURATIONS ] ---------
-TH_ZONE=5
+TH_ZONE=${THERMOSTAT_ZONE}
 OVERLAY_TEMP_CELSIUS=21.00
 OVERLAY_TEMP_FAHRENHEIT=69.80
 OVERLAY_DURATION=1800
 
-ROOM1_ZONE=2
+ROOM1_ZONE=${R1_ZONE}
 ROOM_TEMPERATURE_MAX_DIFFERENTIAL=100 # 100 = 1 celsius
 
 DO_GET_REAL_DATA=true
 DO_CREATE_NEW_SESSION=true
 
 DO_CREATE_OVERLAYS=true
-OVERLAY_SETTING_TEMPLATE_FILE_PATH=./F1B.add_overlay_payload_template_v2.json
+OVERLAY_SETTING_TEMPLATE_FILE_PATH=./F1B.add_overlay_payload_temperature.tpl
+OVERLAY_SETTING_OFF_TEMPLATE_FILE_PATH=./F1B.add_overlay_payload_off.tpl
 # --------- [ end CONFIGURATIONS ] ---------
 
 LOG_SEPARATOR_MAJOR="*************************************************************"
@@ -45,9 +60,10 @@ then
 
      ./A3.zones.sh
      ./A4.weather.sh
-     ./A5.get_data.sh
-     ./B1.zones_available_timetables.sh  B3.zones_overall_schedule.sh
-     ./B2.zones_active_timetable.sh
+     ./A5.get_data.sh ${TH_ZONE} ${ROOM1_ZONE}
+     #./B1.zones_available_timetables.sh  
+     #./B3.zones_overall_schedule.sh
+     #./B2.zones_active_timetable.sh
 
      echo "Data collected!"
 else
@@ -66,9 +82,11 @@ TH_HEATING_PERCENTAGE=${TH_HEATING_PERCENTAGE:0:4}
 TH_HEATING_SETTING=$(jq -r .setting.power ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json)
 #TH_HEATING_SETTING="OFF"
 
-TH_HEATING_HAS_OVERLAY=$(jq -r .overlay ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json)
-if [ "${TH_HEATING_HAS_OVERLAY}" == "null" ]
+TH_HEATING_HAS_OVERLAY=$(jq -r .overlay.type ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json)
+if [ "${TH_HEATING_HAS_OVERLAY}" == "MANUAL" ]
 then
+     TH_HEATING_HAS_OVERLAY=true
+else
      TH_HEATING_HAS_OVERLAY=false
 fi
 
@@ -199,9 +217,34 @@ then
           fi
      fi
 else
-     echo "ROOM1 is currently set to OFF: no action!"
-     CSV_ACTION_CODE=19
-     CSV_ACTION_DESCRIPTION="ROOM SET TO OFF, KEEP UNCHANGED"
+     echo "ROOM1 is currently set to OFF."
+     if [ "${TH_HEATING_HAS_OVERLAY}" == "true" ]
+     then
+          echo "Removing overlay that forced thermo to heat on"
+
+          A9_RETVAL=0
+          if [ "${DO_CREATE_OVERLAYS}" == "true" ]
+          then
+               ./A9.set_overlay.sh UNSET \
+                                   ${TADO_HOME_ID} \
+                                   ${TH_ZONE}
+
+               A9_RETVAL=$?
+          fi
+
+          if [ ${A9_RETVAL} -eq 0 ]
+          then
+               CSV_ACTION_CODE=29
+               CSV_ACTION_DESCRIPTION="REMOVING OVERLAY ON THERMO"
+          else
+               CSV_ACTION_CODE=39
+               CSV_ACTION_DESCRIPTION="ERROR WHEN REMOVING OVERLAY: ${A9_RETVAL}"
+          fi
+     else
+          echo "No overlay = No action"
+          CSV_ACTION_CODE=19
+          CSV_ACTION_DESCRIPTION="ROOM SET TO OFF, KEEP UNCHANGED"
+     fi
 fi
 
 if [ -f ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH} ]
@@ -214,4 +257,4 @@ fi
 
 echo "${CSV_TS};${TH_HEATING_PERCENTAGE};${TH_HEATING_SETTING};${TH_HEATING_HAS_OVERLAY};${ROOM1_CURRENT_TEMPERATURE};${ROOM1_TARGET_TEMPERATURE};${ROOM1_HEATING_PERCENTAGE};${ROOM1_HEATING_SETTING};${ROOM_TEMPERATURE_MAX_DIFFERENTIAL};${CSV_ACTION_CODE};\"${CSV_ACTION_DESCRIPTION}\"" >> ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH}
 
-rm -rf ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}
+#rm -rf ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}

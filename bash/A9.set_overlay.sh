@@ -3,8 +3,8 @@
 . ./00.variables.sh
 
 DO_EXECUTE_CURLZ=true
-CURL_VERBOSITY=-v #verbose
-#CURL_VERBOSITY=-s #silent
+#CURL_VERBOSITY=-v #verbose
+CURL_VERBOSITY=-s #silent
 
 # ----- [ MANDATORY ] -----
 OVERLAY_COMMAND=${1}
@@ -87,7 +87,7 @@ then
                 -X DELETE \
                 -H "Authorization: Bearer ${BEARER_TOKEN}" \
                 -o ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}_${TADO_OVERLAY_SET_JSON_RESULT_PREFIX}_${ZONE_ID}_UNSET_$(date +"%Y%d%m_%H%M%S").json \
-                ${TADO_API_HOME_DETAILS_BASE_URI}/${TADO_HOME_ID}/zones/${TH_ZONE}/overlay
+                ${TADO_API_HOME_DETAILS_BASE_URI}/${HOME_ID}/zones/${ZONE_ID}/overlay
     fi
 else
     echo "*** ERROR: unrecognized command ('${OVERLAY_COMMAND}'), use 'SET' or 'UNSET' only"
