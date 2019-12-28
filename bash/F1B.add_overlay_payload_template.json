@@ -1,0 +1,19 @@
+{
+    "type": "MANUAL",
+    "setting": {
+        "type": "HEATING",
+        "power": "ON",
+        "temperature": {
+            "celsius": ${MANUAL_TEMPERATURE_CELSIUS},
+            "fahrenheit": ${MANUAL_TEMPERATURE_FAHRENHEIT}
+        }
+    },
+    "termination": {
+        "type": "TIMER",
+        "typeSkillBasedApp": "TIMER",
+        "durationInSeconds": ${MANUAL_DURATION_S},
+        "expiry": "${EXPIRATION_TIMESTAMP}",
+        "remainingTimeInSeconds": ${REMAINING_TIME_S},
+        "projectedExpiry": "${PROJECTED_EXPIRATION_TIMESTAMP}"
+    }
+}

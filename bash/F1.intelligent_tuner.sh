@@ -2,12 +2,26 @@
 
 . ./00.variables.sh
 
-DO_GET_REAL_DATA=0
+LOG_SEPARATOR_MAJOR="*************************************************************"
+LOG_SEPARATOR_MINOR="-------------------------------------------------------------"
 
-./01.create_session.sh
+DO_GET_REAL_DATA=false
+DO_CREATE_NEW_SESSION=false
+
+DO_CREATE_OVERLAYS=true
+OVERLAY_SETTING_TEMPLATE_FILE_PATH=./F1B.add_overlay_payload_template.json
+
+#INTELLIGENT_TUNER_LOG_CSV_FILE_PATH=${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${INTELLIGENT_TUNER_LOG_CSV}
+INTELLIGENT_TUNER_LOG_CSV_FILE_PATH=${WORKDIR}/${INTELLIGENT_TUNER_LOG_CSV}
+
+if [ "${DO_CREATE_NEW_SESSION}" == "true" ]
+then
+     ./01.create_session.sh
+fi
+
 SESSION_NAME=$(cat ${WORKDIR}/${SESSION_FILENAME})
 
-if [ ${DO_GET_REAL_DATA} -gt 0 ]
+if [ "${DO_GET_REAL_DATA}" == "true" ]
 then
      ./02.login.sh
 
@@ -29,69 +43,146 @@ then
 fi
 
 # --------- [ CONFIGURATIONS ] ---------
+TH_ZONE=5
+OVERLAY_TEMP_CELSIUS=21.00
+OVERLAY_TEMP_FAHRENHEIT=69.80
+OVERLAY_DURATION=1800
+
+ROOM1_ZONE=2
 ROOM_TEMPERATURE_MAX_DIFFERENTIAL=100
 
+
 # --------- [ SITUATION ] ---------
-TH_HEATING_PERCENTAGE=0
-TH_HEATING_SETTING=OFF
-TH_HEATING_HAS_OVERLAY=false
-ROOM1_CURRENT_TEMPERATURE=1690
-ROOM1_TARGET_TEMPERATURE=2100
-ROOM1_HEATING_PERCENTAGE=100
-ROOM1_HEATING_SETTING=ON
+ZONE_DATA_FILE_PREFIX=${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${TADO_API_PERZONE_JSON_RESULT_PREFIX}
+
+TH_HEATING_PERCENTAGE=$(jq -r .activityDataPoints.heatingPower.percentage ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json | sed "s/\.//g")
+TH_HEATING_PERCENTAGE="${TH_HEATING_PERCENTAGE}0000"
+TH_HEATING_PERCENTAGE=${TH_HEATING_PERCENTAGE:0:4}
+
+TH_HEATING_SETTING=$(jq -r .setting.power ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json)
+
+TH_HEATING_HAS_OVERLAY=$(jq -r .overlay ${ZONE_DATA_FILE_PREFIX}_${TH_ZONE}.json)
+if [ "${TH_HEATING_HAS_OVERLAY}" == "null" ]
+then
+     TH_HEATING_HAS_OVERLAY=false
+fi
+
+#-----------
+
+ROOM1_CURRENT_TEMPERATURE=$(jq -r .sensorDataPoints.insideTemperature.celsius ${ZONE_DATA_FILE_PREFIX}_${ROOM1_ZONE}.json | sed "s/\.//g")
+ROOM1_CURRENT_TEMPERATURE="${ROOM1_CURRENT_TEMPERATURE}0000"
+ROOM1_CURRENT_TEMPERATURE=${ROOM1_CURRENT_TEMPERATURE:0:4}
+
+ROOM1_TARGET_TEMPERATURE=$(jq -r .setting.temperature.celsius ${ZONE_DATA_FILE_PREFIX}_${ROOM1_ZONE}.json | sed "s/\.//g")
+ROOM1_TARGET_TEMPERATURE="${ROOM1_TARGET_TEMPERATURE}0000"
+ROOM1_TARGET_TEMPERATURE=${ROOM1_TARGET_TEMPERATURE:0:4}
+
+ROOM1_HEATING_PERCENTAGE=$(jq -r .activityDataPoints.heatingPower.percentage ${ZONE_DATA_FILE_PREFIX}_${ROOM1_ZONE}.json | sed "s/\.//g")
+ROOM1_HEATING_PERCENTAGE="${ROOM1_HEATING_PERCENTAGE}0000"
+ROOM1_HEATING_PERCENTAGE=${ROOM1_HEATING_PERCENTAGE:0:4}
+
+ROOM1_HEATING_SETTING=$(jq -r .setting.power ${ZONE_DATA_FILE_PREFIX}_${ROOM1_ZONE}.json)
+
+ROOM1_WINDOW_OPEN=$(jq -r .openWindow ${ZONE_DATA_FILE_PREFIX}_${ROOM1_ZONE}.json)
+if [ "${ROOM1_WINDOW_OPEN}" == "null" ]
+then
+     ROOM1_WINDOW_OPEN=false
+fi
+
+echo "${LOG_SEPARATOR_MAJOR}"
+echo "***   CURRENT SITUATION"
+echo "${LOG_SEPARATOR_MINOR}"
+echo "*"
+echo "*      -     THERMOSTAT ZONE: ${TH_ZONE}"
+echo "*      -      THERMO HEATING: ${TH_HEATING_PERCENTAGE}"
+echo "*      - THERMO HEAT SETTING: ${TH_HEATING_SETTING}"
+echo "*      -  THERMO HAS OVERLAY: ${TH_HEATING_HAS_OVERLAY}"
+echo "*"
+echo "*      -         ROOM 1 ZONE: ${ROOM1_ZONE}"
+echo "*      - ROOM 1 CURRENT TEMP: ${ROOM1_CURRENT_TEMPERATURE}"
+echo "*      -  ROOM 1 TARGET TEMP: ${ROOM1_TARGET_TEMPERATURE}"
+echo "*      -      ROOM 1 HEATING: ${ROOM1_HEATING_PERCENTAGE}"
+echo "*      - ROOM 1 HEAT SETTING: ${ROOM1_HEATING_SETTING}"
+echo "*      -  ROOM 1 WINDOW OPEN: ${ROOM1_WINDOW_OPEN}"
+echo "*"
+echo "${LOG_SEPARATOR_MAJOR}"
+
 
 # --------- [ IMPLEMENTATION ] ---------
 CSV_TS=$(date -u +"%FT%T.000Z")
 CSV_ACTION_CODE=0
-CSV_ACTION_DESCRIPTION="KEEP UNCHANGED"
+CSV_ACTION_DESCRIPTION="UNMATCHED EVENT"
 
 if [ "${ROOM1_HEATING_SETTING}" == "ON" ]
 then
-     TARGET_CURRENT_DIFFERENTIAL=0
-     let "TARGET_CURRENT_DIFFERENTIAL=ROOM1_CURRENT_TEMPERATURE-ROOM1_TARGET_TEMPERATURE"
-     if [ ${TARGET_CURRENT_DIFFERENTIAL} -lt 0 ]
+     if [ "${ROOM1_WINDOW_OPEN}" == "true" ]
      then
-          let "TARGET_CURRENT_DIFFERENTIAL = -1 * TARGET_CURRENT_DIFFERENTIAL"
-     fi
-
-     if [ ${TARGET_CURRENT_DIFFERENTIAL} -gt ${ROOM_TEMPERATURE_MAX_DIFFERENTIAL} ]
-     then
-          echo "Temperature differential in ROOM1 is greater than tolerated: ${TARGET_CURRENT_DIFFERENTIAL} (ref. ${ROOM_TEMPERATURE_MAX_DIFFERENTIAL})"
-          if [ "${TH_HEATING_SETTING}" == "OFF" ]
-          then
-               echo "Thermo is currently OFF, creating overlay for the thermostat to heat on"
-               # TODO
-               CSV_ACTION_CODE=9
-               CSV_ACTION_DESCRIPTION="ADD OVERLAY TO START THERMO"
-          else
-               echo "Thermo is already running, just letting it do its job!"
-               CSV_ACTION_CODE=0
-               CSV_ACTION_DESCRIPTION="KEEP UNCHANGED"
-          fi
+          echo "ROOM1 has an open window, keeping everything unchanged"
+          CSV_ACTION_CODE=18
+          CSV_ACTION_DESCRIPTION="OPEN WINDOW, KEEP UNCHANGED"
      else
-          echo "Temperature differential in ROOM1 is ok"
-          if [ "${TH_HEATING_HAS_OVERLAY}" == "true" ]
+          TARGET_CURRENT_DIFFERENTIAL=0
+          let "TARGET_CURRENT_DIFFERENTIAL=ROOM1_CURRENT_TEMPERATURE-ROOM1_TARGET_TEMPERATURE"
+          if [ ${TARGET_CURRENT_DIFFERENTIAL} -lt 0 ]
           then
-               echo "Removing overlay that forced thermo to heat on"
-               # TODO
-               CSV_ACTION_CODE=8
-               CSV_ACTION_DESCRIPTION="REMOVING OVERLAY ON THERMO"
+               let "TARGET_CURRENT_DIFFERENTIAL = -1 * TARGET_CURRENT_DIFFERENTIAL"
+          fi
+
+          if [ ${TARGET_CURRENT_DIFFERENTIAL} -gt ${ROOM_TEMPERATURE_MAX_DIFFERENTIAL} ]
+          then
+               echo "Temperature differential in ROOM1 is greater than tolerated: ${TARGET_CURRENT_DIFFERENTIAL} (ref. ${ROOM_TEMPERATURE_MAX_DIFFERENTIAL})"
+               if [ "${TH_HEATING_SETTING}" == "OFF" ]
+               then
+                    echo "Thermo is currently OFF, creating overlay for the thermostat to heat on"
+
+                    ./A9.set_overlay.sh SET \
+                                        ${TADO_HOME_ID} \
+                                        ${TH_ZONE} \
+                                        ${OVERLAY_SETTING_TEMPLATE_FILE_PATH} \
+                                        ${OVERLAY_TEMP_CELSIUS} \
+                                        ${OVERLAY_TEMP_FAHRENHEIT} \
+                                        ${OVERLAY_DURATION}
+
+                    CSV_ACTION_CODE=20
+                    CSV_ACTION_DESCRIPTION="ADD OVERLAY TO START THERMO"
+               else
+                    echo "Thermo is already running, just letting it do its job!"
+                    CSV_ACTION_CODE=10
+                    CSV_ACTION_DESCRIPTION="KEEP UNCHANGED"
+               fi
           else
-               echo "Just keep the thermo going its way"
-               CSV_ACTION_CODE=0
-               CSV_ACTION_DESCRIPTION="KEEP UNCHANGED"
+               echo "Temperature differential in ROOM1 is ok"
+               if [ "${TH_HEATING_HAS_OVERLAY}" == "true" ]
+               then
+                    echo "Removing overlay that forced thermo to heat on"
+
+                    ./A9.set_overlay.sh UNSET \
+                                        ${TADO_HOME_ID} \
+                                        ${TH_ZONE}
+
+                    echo $?
+
+                    CSV_ACTION_CODE=29
+                    CSV_ACTION_DESCRIPTION="REMOVING OVERLAY ON THERMO"
+               else
+                    echo "Just keep the thermo going its way"
+                    CSV_ACTION_CODE=11
+                    CSV_ACTION_DESCRIPTION="TEMP DIFF IS OK (${TARGET_CURRENT_DIFFERENTIAL} less than ${ROOM_TEMPERATURE_MAX_DIFFERENTIAL}), KEEP UNCHANGED"
+               fi
           fi
      fi
 else
      echo "ROOM1 is currently set to OFF: no action!"
+     CSV_ACTION_CODE=19
+     CSV_ACTION_DESCRIPTION="ROOM SET TO OFF, KEEP UNCHANGED"
 fi
 
-if [ -f ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${INTELLIGENT_TUNER_LOG_CSV} ]
+if [ -f ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH} ]
 then
      echo "appending log to file"
 else
      echo "creating log file"
-     echo "CSV_TS;TH_HEATING_PERCENTAGE;TH_HEATING_SETTING;TH_HEATING_HAS_OVERLAY;ROOM1_CURRENT_TEMPERATURE;ROOM1_TARGET_TEMPERATURE;ROOM1_HEATING_PERCENTAGE;ROOM1_HEATING_SETTING;CSV_ACTION_CODE;CSV_ACTION_DESCRIPTION" > ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${INTELLIGENT_TUNER_LOG_CSV}
+     echo "CSV_TS;TH_HEATING_PERCENTAGE;TH_HEATING_SETTING;TH_HEATING_HAS_OVERLAY;ROOM1_CURRENT_TEMPERATURE;ROOM1_TARGET_TEMPERATURE;ROOM1_HEATING_PERCENTAGE;ROOM1_HEATING_SETTING;CSV_ACTION_CODE;CSV_ACTION_DESCRIPTION" > ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH}
 fi
 
-echo "${CSV_TS};${TH_HEATING_PERCENTAGE};${TH_HEATING_SETTING};${TH_HEATING_HAS_OVERLAY};${ROOM1_CURRENT_TEMPERATURE};${ROOM1_TARGET_TEMPERATURE};${ROOM1_HEATING_PERCENTAGE};${ROOM1_HEATING_SETTING};${CSV_ACTION_CODE};\"${CSV_ACTION_DESCRIPTION}\"" >> ${WORKDIR}/${SESSION_DIR_PREFIX}${SESSION_NAME}/${INTELLIGENT_TUNER_LOG_CSV}
+echo "${CSV_TS};${TH_HEATING_PERCENTAGE};${TH_HEATING_SETTING};${TH_HEATING_HAS_OVERLAY};${ROOM1_CURRENT_TEMPERATURE};${ROOM1_TARGET_TEMPERATURE};${ROOM1_HEATING_PERCENTAGE};${ROOM1_HEATING_SETTING};${CSV_ACTION_CODE};\"${CSV_ACTION_DESCRIPTION}\"" >> ${INTELLIGENT_TUNER_LOG_CSV_FILE_PATH}

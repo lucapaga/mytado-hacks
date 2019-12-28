@@ -36,6 +36,9 @@ TADO_API_WEATHER_JSON_RESULT=tado_api_home_weather.json
 
 TADO_API_PLOTDATA_JSON_RESULT_PREFIX=tado_api_plotdata_forzone
 
+TADO_OVERLAY_SET_JSON_RESULT_PREFIX=overlay_set
+TADO_OVERLAY_UNSET_JSON_RESULT_PREFIX=overlay_unset
+
 TADO_DATA_CSV=tado_data.csv
 
 TADO_DATA_HOME_ID=tado_home_id.dat
