@@ -23,7 +23,7 @@ OVERLAY_TEMP_FAHRENHEIT=69.80
 OVERLAY_DURATION=1800
 
 ROOM1_ZONE=${R1_ZONE}
-ROOM_TEMPERATURE_MAX_DIFFERENTIAL=100 # 100 = 1 celsius
+ROOM_TEMPERATURE_MAX_DIFFERENTIAL=50 # 100 = 1 celsius
 
 DO_GET_REAL_DATA=true
 DO_CREATE_NEW_SESSION=true
@@ -145,11 +145,13 @@ then
           CSV_ACTION_DESCRIPTION="OPEN WINDOW, KEEP UNCHANGED"
      else
           TARGET_CURRENT_DIFFERENTIAL=0
-          let "TARGET_CURRENT_DIFFERENTIAL=ROOM1_CURRENT_TEMPERATURE-ROOM1_TARGET_TEMPERATURE"
-          if [ ${TARGET_CURRENT_DIFFERENTIAL} -lt 0 ]
-          then
-               let "TARGET_CURRENT_DIFFERENTIAL = -1 * TARGET_CURRENT_DIFFERENTIAL"
-          fi
+
+          #let "TARGET_CURRENT_DIFFERENTIAL=ROOM1_CURRENT_TEMPERATURE-ROOM1_TARGET_TEMPERATURE"
+          #if [ ${TARGET_CURRENT_DIFFERENTIAL} -lt 0 ]
+          #then
+          #     let "TARGET_CURRENT_DIFFERENTIAL = -1 * TARGET_CURRENT_DIFFERENTIAL"
+          #fi
+          let "TARGET_CURRENT_DIFFERENTIAL=ROOM1_TARGET_TEMPERATURE-ROOM1_CURRENT_TEMPERATURE"
 
           if [ ${TARGET_CURRENT_DIFFERENTIAL} -gt ${ROOM_TEMPERATURE_MAX_DIFFERENTIAL} ]
           then
@@ -189,25 +191,35 @@ then
                echo "Temperature differential in ROOM1 is ok"
                if [ "${TH_HEATING_HAS_OVERLAY}" == "true" ]
                then
-                    echo "Removing overlay that forced thermo to heat on"
+                    HYSTERESIS=0
+                    let "HYSTERESIS=ROOM1_CURRENT_TEMPERATURE-ROOM1_TARGET_TEMPERATURE"
 
-                    A9_RETVAL=0
-                    if [ "${DO_CREATE_OVERLAYS}" == "true" ]
+                    if [ ${HYSTERESIS} -ge 0 ]
                     then
-                         ./A9.set_overlay.sh UNSET \
-                                             ${TADO_HOME_ID} \
-                                             ${TH_ZONE}
+                         echo "Removing overlay that forced thermo to heat on"
 
-                         A9_RETVAL=$?
-                    fi
+                         A9_RETVAL=0
+                         if [ "${DO_CREATE_OVERLAYS}" == "true" ]
+                         then
+                              ./A9.set_overlay.sh UNSET \
+                                                  ${TADO_HOME_ID} \
+                                                  ${TH_ZONE}
 
-                    if [ ${A9_RETVAL} -eq 0 ]
-                    then
-                         CSV_ACTION_CODE=29
-                         CSV_ACTION_DESCRIPTION="REMOVING OVERLAY ON THERMO"
+                              A9_RETVAL=$?
+                         fi
+
+                         if [ ${A9_RETVAL} -eq 0 ]
+                         then
+                              CSV_ACTION_CODE=29
+                              CSV_ACTION_DESCRIPTION="REMOVING OVERLAY ON THERMO"
+                         else
+                              CSV_ACTION_CODE=39
+                              CSV_ACTION_DESCRIPTION="ERROR WHEN REMOVING OVERLAY: ${A9_RETVAL}"
+                         fi
                     else
-                         CSV_ACTION_CODE=39
-                         CSV_ACTION_DESCRIPTION="ERROR WHEN REMOVING OVERLAY: ${A9_RETVAL}"
+                         echo "Thermo has overlay but room temp (${ROOM1_CURRENT_TEMPERATURE}) is still not at target (${ROOM1_TARGET_TEMPERATURE})"
+                         CSV_ACTION_CODE=21
+                         CSV_ACTION_DESCRIPTION="KEEPING OVERLAY ON THERMO AS ROOM TEMP (${ROOM1_CURRENT_TEMPERATURE}) IS NOT AT TARGET (${ROOM1_TARGET_TEMPERATURE}) YET"
                     fi
                else
                     echo "Just keep the thermo going its way"
