@@ -5,10 +5,11 @@ import { BAD_REQUEST, CREATED, OK, PRECONDITION_FAILED } from 'http-status-codes
 import { paramMissingError } from '@shared';
 import { ParamsDictionary } from 'express-serve-static-core';
 
-import { doSaluteWorld } from '../../../business-logic'
+import { doSaluteWorld, ISpecialSchedule, SpecialSchedule } from '../../../business-logic'
 
 // Init shared
 const router = Router();
+var specialSchedule: ISpecialSchedule;
 //const accountDao = new AccountDao();
 
 
@@ -58,7 +59,7 @@ router.put('/homes/:homeId/special-schedules/:scheduleUUID/:command', async (req
 
         if (command == "ON") {
             console.log("Activating schedule '" + scheduleUUID + "' on home '" + homeId + "'");
-            return res.status(OK).json({salutation: doSaluteWorld()});
+            return res.status(OK).json({ salutation: doSaluteWorld() });
         } else if (command == "OFF") {
             console.log("Deactivating schedule '" + scheduleUUID + "' on home '" + homeId + "'");
             return res.status(OK).json({});
