@@ -3,3 +3,4 @@ export function doSaluteWorld(): string {
 }
 
 export * from './entities';
+export * from "./application";
