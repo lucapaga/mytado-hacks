@@ -16,6 +16,7 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
+    "@types/request-promise-native": "^1.0.17",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"
   }

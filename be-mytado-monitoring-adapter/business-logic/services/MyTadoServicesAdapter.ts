@@ -6,15 +6,15 @@ import { MyTadoServiceAuthorization } from "./MyTadoServiceAuthorization";
 var rp = require('request-promise-native');
 
 export interface IMyTadoServicesAdapter {
-    login(user: string, password: string): MyTadoServiceAuthorization  | null;
-    addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, temperature: number, duration: number): IMyTadoOverlay;
-    removeOverlayForHomeAndZone(homeId: number, zoneId: number): IMyTadoOverlay;
+    login(user: string, password: string): Promise<MyTadoServiceAuthorization>;
+    addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
+    removeOverlayForHomeAndZone(homeId: number, zoneId: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
 }
 
 export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
     private authToken: MyTadoServiceAuthorization | null = null;
 
-    login(user: string, password: string): MyTadoServiceAuthorization | null {
+    async login(user: string, password: string): Promise<MyTadoServiceAuthorization> {
         const options = {
             method: 'POST',
             uri: 'https://auth.tado.com/oauth/token',
@@ -31,25 +31,33 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
 
         console.log("Payload: ", options);
 
-        this.authToken = rp(options).then(function (data: any) {
-            console.info(data);
+        return rp(options).then(function (data: any) {
+            //console.info(data);
             return new MyTadoServiceAuthorization(data['access_token']);
         }).catch(function (err: any) {
-            console.error(err);
+            console.error(err["message"]);
             return null;
         });
-
-        return this.authToken;
     }
 
 
-    addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, temperature: number, duration: number): IMyTadoOverlay {
+    async addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay> {
         console.info("Adding overlay. Home=" + homeId + ", Zone=" + zoneId + ", T=" + temperature + " C, duration=" + duration + "s");
+
+        var token: string = "";
+        if(authToken == null) {
+            console.warn("'authToken' is passed NULL");
+        } else {
+            console.log("AuthToken: ", authToken);
+            token = authToken.token;
+            console.log("Bearer token: ", token);
+        }
+
         const options = {
             method: 'PUT',
-            uri: 'https://my.tado.com/api/v2/' + homeId + '/zones/' + zoneId + '/overlay',
+            uri: 'https://my.tado.com/api/v2/homes/' + homeId + '/zones/' + zoneId + '/overlay',
             headers: {
-                Authorization: 'Bearer ' + ((this.authToken == null) ? "" : this.authToken.token)
+                Authorization: 'Bearer ' + token
             },
             body: {
                 setting: {
@@ -61,7 +69,7 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
                 },
                 termination: {
                     type: "TIMER",
-                    durationInSecond: duration
+                    durationInSeconds: duration
                 }
             },
             json: true
@@ -69,16 +77,43 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
 
         console.log("Payload: ", options);
 
-        rp(options).then(function (data: any) {
-            console.info(data);
+        return rp(options).then(function (data: any) {
+            //console.info(data);
+            return new MyTadoOverlay();
         }).catch(function (err: any) {
-            console.error(err);
+            console.error(err["message"]);
         });
-
-        return new MyTadoOverlay();
     }
-    removeOverlayForHomeAndZone(homeId: number, zoneId: number): IMyTadoOverlay {
-        console.info("Adding overlay. Home=" + homeId + ", Zone=" + zoneId);
-        return new MyTadoOverlay();
+
+    async removeOverlayForHomeAndZone(homeId: number, zoneId: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay> {
+        console.info("Removing overlay. Home=" + homeId + ", Zone=" + zoneId);
+
+        var token: string = "";
+        if(authToken == null) {
+            console.warn("'authToken' is passed NULL");
+        } else {
+            console.log("AuthToken: ", authToken);
+            token = authToken.token;
+            console.log("Bearer token: ", token);
+        }
+
+        const options = {
+            method: 'DELETE',
+            uri: 'https://my.tado.com/api/v2/homes/' + homeId + '/zones/' + zoneId + '/overlay',
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+            body: {},
+            json: true
+        };
+
+        console.log("Payload: ", options);
+
+        return rp(options).then(function (data: any) {
+            //console.info(data);
+            return new MyTadoOverlay();
+        }).catch(function (err: any) {
+            console.error(err["message"]);
+        });
     }
 }

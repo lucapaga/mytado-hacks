@@ -24,20 +24,30 @@ export class SpecialSchedulesApllicationService {
         //var resOverlay: IMyTadoOverlay = this.myTadoServiceAdapter.addTimedTemperatureOverlayForHomeAndZone(schedule.home.id, "", 10, 1800);
     }
 
-    findAndActivateSchedule(homeId: number, specialScheduleId: string): void {
+    async findAndActivateSchedule(homeId: number, specialScheduleId: string) {
         var schedule: ISpecialSchedule | null = this.findSpecialSchedulesById(homeId, specialScheduleId);
         if (schedule != null) {
             console.log("Logging in ...");
-            var authToken = this.myTadoServiceAdapter.login("", "");
+            var authToken: MyTadoServiceAuthorization = await this.myTadoServiceAdapter.login("luca.paga@gmail.com", "4G@LdQA3vL75Bmx");
             console.log("Auth: ", authToken);
+
             console.log("SpecialSchedule(homeId=" + schedule.home.id + ", id=>" + schedule.id + "<) found, ACTIVATING it ...");
-            /*
+
+            var promises : Promise<IMyTadoOverlay>[] = [];
             schedule.settings.forEach(aZoneSetting => {
                 if(schedule != null) {
-                    this.myTadoServiceAdapter.addTimedTemperatureOverlayForHomeAndZone(schedule.home.id, aZoneSetting.zone.id, aZoneSetting.temperature, aZoneSetting.duration);
+                    promises.push(
+                        this.myTadoServiceAdapter.addTimedTemperatureOverlayForHomeAndZone(
+                                                        schedule.home.id, 
+                                                        aZoneSetting.zone.id, 
+                                                        aZoneSetting.temperature, 
+                                                        aZoneSetting.duration, 
+                                                        authToken));
                 }
             });
-            */
+
+            var results = await Promise.all(promises);
+
             schedule.activate();
         }
     }
@@ -47,12 +57,29 @@ export class SpecialSchedulesApllicationService {
         //var resOverlay: IMyTadoOverlay = this.myTadoServiceAdapter.removeOverlayForHomeAndZone(schedule.home.id, "");
     }
 
-    findAndDeactivateSchedule(homeId: number, specialScheduleId: string): void {
+    async findAndDeactivateSchedule(homeId: number, specialScheduleId: string) {
         var schedule: ISpecialSchedule | null = this.findSpecialSchedulesById(homeId, specialScheduleId);
         if (schedule != null) {
+            console.log("Logging in ...");
+            var authToken: MyTadoServiceAuthorization = await this.myTadoServiceAdapter.login("luca.paga@gmail.com", "4G@LdQA3vL75Bmx");
+            console.log("Auth: ", authToken);
+
             console.log("SpecialSchedule(homeId=" + schedule.home.id + ", id=>" + schedule.id + "<) found, DEactivating it ...");
+
+            var promises : Promise<IMyTadoOverlay>[] = [];
+            schedule.settings.forEach(aZoneSetting => {
+                if(schedule != null) {
+                    promises.push(
+                        this.myTadoServiceAdapter.removeOverlayForHomeAndZone(
+                                                        schedule.home.id, 
+                                                        aZoneSetting.zone.id, 
+                                                        authToken));
+                }
+            });
+
+            var results = await Promise.all(promises);
+
             schedule.deactivate();
-            //var resOverlay: IMyTadoOverlay = this.myTadoServiceAdapter.addTimedTemperatureOverlayForHomeAndZone(schedule.home.id, "", 10, 1800);
         }
     }
 

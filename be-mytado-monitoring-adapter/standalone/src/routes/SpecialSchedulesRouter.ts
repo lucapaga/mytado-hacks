@@ -67,11 +67,11 @@ router.put('/homes/:homeId/special-schedules/:scheduleUUID/:command', async (req
 
         if (command == "ON") {
             console.log("Activating schedule '" + scheduleUUID + "' on home '" + homeId + "'");
-            specialSchedulesApplicationService.findAndActivateSchedule(+req.params['homeId'], req.params['scheduleUUID']);
+            await specialSchedulesApplicationService.findAndActivateSchedule(+req.params['homeId'], req.params['scheduleUUID']);
             return res.status(OK).json({});
         } else if (command == "OFF") {
             console.log("Deactivating schedule '" + scheduleUUID + "' on home '" + homeId + "'");
-            specialSchedulesApplicationService.findAndDeactivateSchedule(+req.params['homeId'], req.params['scheduleUUID']);
+            await specialSchedulesApplicationService.findAndDeactivateSchedule(+req.params['homeId'], req.params['scheduleUUID']);
             return res.status(OK).json({});
         } else {
             const errMsg = "Invalid command '" + command + "'";
