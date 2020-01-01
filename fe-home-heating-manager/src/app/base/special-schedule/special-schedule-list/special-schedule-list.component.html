@@ -1,0 +1,49 @@
+<mat-grid-list cols="2" rowHeight="300px">
+    <mat-grid-tile *ngFor="let anSS of listOfSpecialSchedules">
+        <mat-card class="special-schedule-card">
+            <mat-card-header>
+                <div mat-card-avatar>
+                    <mat-icon class="main-toolbar-right-icon" aria-hidden="false" aria-label="Example heart icon">
+                        schedule
+                    </mat-icon>
+                </div>
+                <mat-card-title>{{anSS.description}}</mat-card-title>
+                <mat-card-subtitle>ID: {{anSS.id}}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <ul>
+                    <li>
+                        Home: Luca & Chiara
+                    </li>
+                    <li>
+                        Zone:
+                        <ul>
+                            <li>
+                                SALA (T)
+                            </li>
+                            <li>
+                                CAMERA MATRIMONIALE
+                            </li>
+                            <li>
+                                CAMERA B P 
+                            </li>
+                            <li>
+                                CAMERA B G
+                            </li>
+                            <li>
+                                SALA
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </mat-card-content>
+            <mat-card-actions>
+                <button *ngIf="!anSS.active" mat-button class="mat-button-activate" (click)="activateSchedule(anSS)">ATTIVA</button>
+                <button *ngIf="anSS.active" mat-button class="mat-button-deactivate" (click)="deactivateSchedule(anSS)">DISATTIVA</button>
+
+                <button mat-button class="push-right" (click)="deleteSchedule(anSS)">RIMUOVI</button>
+                <button mat-button class="push-right" routerLink="/special-schedules/{{anSS.id}}">DETTAGLI</button>
+            </mat-card-actions>
+        </mat-card>
+    </mat-grid-tile>
+</mat-grid-list>

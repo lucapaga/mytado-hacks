@@ -1,0 +1,24 @@
+.special-schedule-card {
+    margin: 20px;
+    width: 100%;
+}
+
+.special-schedule-card > mat-card-content {
+    margin-left: 40px;
+}
+
+button.push-right {
+    float: right;
+}
+
+.button-spacer {
+    flex: 1 1 auto;
+}
+
+.mat-button-deactivate {
+    color: cornflowerblue;
+}
+
+.mat-button-activate {
+    color: darkorange;
+}

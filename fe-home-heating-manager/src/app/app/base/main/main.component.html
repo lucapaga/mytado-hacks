@@ -1,1 +1,13 @@
-<p>main works!</p>
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <span>Home Heating Manager</span>
+        <span class="main-toolbar-spacer"></span>
+        <a routerLink="/special-schedules">
+            <mat-icon class="main-toolbar-right-icon" aria-hidden="false" aria-label="Example heart icon">whatshot</mat-icon>
+        </a>
+    </mat-toolbar-row>
+</mat-toolbar>
+
+<div class="main-contentpane-container">
+    <router-outlet></router-outlet>
+</div>

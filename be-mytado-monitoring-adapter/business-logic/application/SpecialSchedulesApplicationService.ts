@@ -28,7 +28,7 @@ export class SpecialSchedulesApllicationService {
         var schedule: ISpecialSchedule | null = this.findSpecialSchedulesById(homeId, specialScheduleId);
         if (schedule != null) {
             console.log("Logging in ...");
-            var authToken: MyTadoServiceAuthorization = await this.myTadoServiceAdapter.login("luca.paga@gmail.com", "4G@LdQA3vL75Bmx");
+            var authToken: MyTadoServiceAuthorization = await this.myTadoServiceAdapter.login("", "");
             console.log("Auth: ", authToken);
 
             console.log("SpecialSchedule(homeId=" + schedule.home.id + ", id=>" + schedule.id + "<) found, ACTIVATING it ...");
