@@ -22,12 +22,17 @@ const specialSchedulesApplicationService: SpecialSchedulesApllicationService = n
 router.get('/homes/:homeId/special-schedules', async (req: Request, res: Response) => {
     try {
         console.log("Request Parameters: ", req.params);
-        
-        //const { homeId: number } = req.params as ParamsDictionary;
-        
-        const specialz = specialSchedulesApplicationService.findSpecialSchedulesForHome(+req.params['homeId']);
-        //await userDao.delete(Number(id));
-        return res.status(OK).json(specialz);
+                
+        const specialz: ISpecialSchedule[] = specialSchedulesApplicationService.findSpecialSchedulesForHome(+req.params['homeId']);
+        const sRet = specialz.map(aSpecial => { 
+            return {    id: aSpecial.id, 
+                        description: aSpecial.description, 
+                        active: aSpecial.isActive, 
+                        homeId: aSpecial.home.id,
+                        zones: aSpecial.settings.map(aSetting => { return { id: aSetting.zone.id, name: aSetting.zone.name } } ) } 
+        });
+
+        return res.status(OK).json(sRet);
     } catch (err) {
         logger.error(err.message, err);
         return res.status(BAD_REQUEST).json({
@@ -78,10 +83,6 @@ router.put('/homes/:homeId/special-schedules/:scheduleUUID/:command', async (req
             console.log(errMsg);
             return res.status(PRECONDITION_FAILED).json({ "errorMessage": errMsg });
         }
-
-        //await userDao.delete(Number(id));
-        //const transactions = {};//await transactionDao.getAll(new Account("", req.params['id'], 0));
-        //return res.status(OK).json(transactions);
     } catch (err) {
         logger.error(err.message, err);
         return res.status(BAD_REQUEST).json({
