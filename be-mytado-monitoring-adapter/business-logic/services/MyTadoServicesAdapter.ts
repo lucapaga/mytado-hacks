@@ -1,20 +1,33 @@
 import { IMyTadoOverlay } from "./"
 import { MyTadoOverlay } from "./MyTadoOverlay";
 import { MyTadoServiceAuthorization } from "./MyTadoServiceAuthorization";
+import { EnvironmentServices } from "./EnvironmentServices";
 
 //import { get, put, RequestPromiseOptions } from "request-promise"
 var rp = require('request-promise-native');
 
 export interface IMyTadoServicesAdapter {
-    login(user: string, password: string): Promise<MyTadoServiceAuthorization>;
+    login(user?: string, password?: string): Promise<MyTadoServiceAuthorization>;
     addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
     removeOverlayForHomeAndZone(homeId: number, zoneId: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
 }
 
 export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
     private authToken: MyTadoServiceAuthorization | null = null;
+    private envServices: EnvironmentServices = new EnvironmentServices();
 
-    async login(user: string, password: string): Promise<MyTadoServiceAuthorization> {
+    async login(user?: string, password?: string): Promise<MyTadoServiceAuthorization> {
+        if(user == null || user == undefined || user === "") {
+            console.log("Username not passed, using env var", process.env);
+            user = this.envServices.envVariable(process.env.MYTADO_SA_USER);
+        }
+        if(password == null || password == undefined || password === "") {
+            console.log("Password not passed, using env var", process.env);
+            password = this.envServices.envVariable(process.env.MYTADO_SA_PWD);
+        }
+
+        console.log("Logging in (user=" + this.envServices.envVariable(process.env.MYTADO_SA_USER) + ") ...");
+
         const options = {
             method: 'POST',
             uri: 'https://auth.tado.com/oauth/token',
