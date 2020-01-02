@@ -12,7 +12,8 @@ export class SpecialScheduleManagerService {
   constructor(private http: HttpClient) { }
 
   listSpecialSchedulesFor(homeId: number): Observable<SpecialSchedule[]> {
-    // [ { user: "luca.paga@gmail.com", password: "" } ]
+    return this.http.get<SpecialSchedule[]>("/mthapis/homes/" + homeId + "/special-schedules/");
+    /*
     this.http.post(
         "https://auth.tado.com/oauth/token", 
         {}, 
@@ -36,6 +37,7 @@ export class SpecialScheduleManagerService {
               });
           }
         );
+    */
     /*
     return of([
       new SpecialSchedule("ID1", "Primo SRV", false),
@@ -43,5 +45,19 @@ export class SpecialScheduleManagerService {
       new SpecialSchedule("ID3", "Terzo SRV", true)
     ]);
     */
+  }
+
+  activateSchedule(homeId: number, specialSchedule: SpecialSchedule): Observable<Object> {
+    return this.http.put<SpecialSchedule>(
+              "/mthapis/homes/" + homeId + "/special-schedules/" + specialSchedule.id + "/ON", 
+              {}
+            );
+  }
+
+  deactivateSchedule(homeId: number, specialSchedule: SpecialSchedule): Observable<Object> {
+    return this.http.put(
+              "/mthapis/homes/" + homeId + "/special-schedules/" + specialSchedule.id + "/OFF", 
+              {}
+            );
   }
 }

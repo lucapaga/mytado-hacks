@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SpecialSchedule } from 'src/app/entities/special-schedule/special-schedule';
 import { SpecialScheduleManagerService } from 'src/app/scvs/special-schedule-manager.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-special-schedule-list',
@@ -31,10 +32,22 @@ export class SpecialScheduleListComponent implements OnInit {
 
   activateSchedule(specialSchedule: SpecialSchedule) {
     console.log("Activating Special Schedule: ", specialSchedule);
+    this.specialScheduleManagerService.activateSchedule(422292, specialSchedule).subscribe(
+      (data: SpecialSchedule) => {
+        specialSchedule.active = true;
+      },
+      error => {}
+    );
   }
 
   deactivateSchedule(specialSchedule: SpecialSchedule) {
     console.log("DEactivating Special Schedule: ", specialSchedule);    
+    this.specialScheduleManagerService.deactivateSchedule(422292, specialSchedule).subscribe(
+      (data: SpecialSchedule) => {
+        specialSchedule.active = false;
+      },
+      error => {}
+    );
   }
 
   deleteSchedule(specialSchedule: SpecialSchedule) {
