@@ -2,6 +2,14 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.19.
 
+Additionally a Docker recipe is created.
+
+Build with
+`docker build -t lucapaga/hhm-fe:0.0.1 .`
+
+Run
+`docker run --name fe-home-heating-mgr -d -p 8080:80 --restart always lucapaga/hhm-fe:0.0.1`
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
