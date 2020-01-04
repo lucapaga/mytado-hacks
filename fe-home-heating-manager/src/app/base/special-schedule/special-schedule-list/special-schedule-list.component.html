@@ -1,29 +1,44 @@
 <mat-card class="special-schedule-card" *ngFor="let anSS of listOfSpecialSchedules">
     <mat-card-header>
-        <div mat-card-avatar>
-            <mat-icon class="main-toolbar-right-icon" aria-hidden="false" aria-label="Example heart icon">
+        <div mat-card-avatar class="special-schedule-card-avatar-box">
+            <mat-icon class="main-toolbar-right-icon" aria-hidden="false" aria-label="Example heart icon" class="special-schedule-card-avatar-icon">
                 schedule
             </mat-icon>
         </div>
         <mat-card-title>{{anSS.description}}</mat-card-title>
-        <mat-card-subtitle>ID: {{anSS.id}}</mat-card-subtitle>
+        <mat-card-subtitle class="special-schedule-card-subtitle">ID: {{anSS.id}} | # of Zones: 5</mat-card-subtitle>
+        <div class="button-spacer"></div>
         <div class="action-icons-container">
             <!--mat-icon  aria-hidden="false" aria-label="Show Details">timer</mat-icon-->
-            <button mat-button *ngIf="!anSS.active" (click)="activateSchedule(anSS)">
-                <mat-icon aria-hidden="false" aria-label="Avvia/Ferma">send</mat-icon>
-            </button>
-            <button mat-button *ngIf=" anSS.active" (click)="deactivateSchedule(anSS)">
-                <mat-icon aria-hidden="false" aria-label="Avvia/Ferma">cancel_schedule_send</mat-icon>
-            </button>
-            <button mat-button routerLink="/special-schedules/{{anSS.id}}">
-                <mat-icon aria-hidden="false" aria-label="Show Details">web</mat-icon>
-            </button>
-            <button mat-button (click)="deleteSchedule(anSS)">
-                <mat-icon aria-hidden="false" aria-label="Remove">delete_outline</mat-icon>
-            </button>
+            <!-- 
+                <a *ngIf="!anSS.active" (click)="activateSchedule(anSS)">
+                    <mat-icon aria-hidden="false" aria-label="Avvia/Ferma" class="command-action-icon">send</mat-icon>
+                </a>
+                <a *ngIf=" anSS.active" (click)="deactivateSchedule(anSS)">
+                    <mat-icon aria-hidden="false" aria-label="Avvia/Ferma" class="command-action-icon">cancel_schedule_send</mat-icon>
+                </a>
+                <a routerLink="/special-schedules/{{anSS.id}}">
+                    <mat-icon aria-hidden="false" aria-label="Show Details" class="command-action-icon">web</mat-icon>
+                </a>
+                <a (click)="deleteSchedule(anSS)">
+                    <mat-icon aria-hidden="false" aria-label="Remove" class="command-action-icon">delete_outline</mat-icon>
+                </a>
+            -->
+
+            <!-- 
+                <button mat-stroked-button class="command-action-button">SET</button> 
+                <button mat-stroked-button class="command-action-button">DTL</button>
+                <button mat-stroked-button class="command-action-button">DEL</button>
+            -->
+
+            <button mat-stroked-button class="command-action-button"><mat-icon aria-hidden="false" aria-label="Avvia/Ferma">send</mat-icon></button> 
+            <button mat-stroked-button class="command-action-button"><mat-icon aria-hidden="false" aria-label="Avvia/Ferma">web</mat-icon></button>
+            <button mat-stroked-button class="command-action-button"><mat-icon aria-hidden="false" aria-label="Avvia/Ferma">delete_outline</mat-icon></button>
         </div>
     </mat-card-header>
-    <mat-card-content>
-        Zone: 1, 2, 4, 5
-    </mat-card-content>
+    <!-- 
+        <mat-card-content>
+            Zone: 1, 2, 4, 5
+        </mat-card-content>
+    -->
 </mat-card>

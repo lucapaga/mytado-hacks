@@ -1,7 +1,28 @@
+.special-schedule-card-avatar-box {
+    width: 50px;
+}
+
+.special-schedule-card-avatar-icon {
+    font-size: 40px;
+}
+
+.special-schedule-card-subtitle {
+    margin-bottom: 5px;
+}
+
+.command-action-icon {
+    font-size: 40px;
+    width: 70px;
+    color: #324090;
+}
+
+.command-action-button {
+    margin: 2px;
+}
+
 .special-schedule-card {
     margin: 12px;
-    width: 85%;
-    height: 95px;
+    border-radius: 20px;
 }
 
 .special-schedule-card > mat-card-content {
@@ -13,10 +34,6 @@
 }
 
 div.action-icons-container {
-    top: 10px;
-    right: 35px;
-    position: absolute;
-    width: 30px;
 }
 
 .button-spacer {
