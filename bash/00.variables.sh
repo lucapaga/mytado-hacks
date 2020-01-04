@@ -40,7 +40,12 @@ TADO_OVERLAY_SET_JSON_RESULT_PREFIX=overlay_set
 TADO_OVERLAY_UNSET_JSON_RESULT_PREFIX=overlay_unset
 
 #TADO_DATA_CSV=tado_data.csv
-TADO_DATA_CSV=tado_data.$(date +"%Y%m%d").csv
+DATE_POINTER=$(date +"%Y%m%d")
+TADO_DATA_CSV=tado_data.${DATE_POINTER}.csv
+TADO_DATA_CSV1L=tado_data.one-line.${DATE_POINTER}.csv
+
+MONITOR_CSV=monitor.${DATE_POINTER}.csv
+MONITOR_CSV1L=monitor.one-line.${DATE_POINTER}.csv
 
 TADO_DATA_HOME_ID=tado_home_id.dat
 
