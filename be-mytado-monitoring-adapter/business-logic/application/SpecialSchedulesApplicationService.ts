@@ -39,6 +39,7 @@ export class SpecialSchedulesApllicationService {
                         this.myTadoServiceAdapter.addTimedTemperatureOverlayForHomeAndZone(
                                                         schedule.home.id, 
                                                         aZoneSetting.zone.id, 
+                                                        aZoneSetting.activateHeating,
                                                         aZoneSetting.temperature, 
                                                         aZoneSetting.duration, 
                                                         authToken));

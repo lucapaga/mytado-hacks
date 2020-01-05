@@ -8,7 +8,7 @@ var rp = require('request-promise-native');
 
 export interface IMyTadoServicesAdapter {
     login(user?: string, password?: string): Promise<MyTadoServiceAuthorization>;
-    addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
+    addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, switchHeatingOn: boolean, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
     removeOverlayForHomeAndZone(homeId: number, zoneId: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
 }
 
@@ -18,11 +18,11 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
 
     async login(user?: string, password?: string): Promise<MyTadoServiceAuthorization> {
         if(user == null || user == undefined || user === "") {
-            console.log("Username not passed, using env var", process.env);
+            //console.log("Username not passed, using env var", process.env);
             user = this.envServices.envVariable(process.env.MYTADO_SA_USER);
         }
         if(password == null || password == undefined || password === "") {
-            console.log("Password not passed, using env var", process.env);
+            //console.log("Password not passed, using env var", process.env);
             password = this.envServices.envVariable(process.env.MYTADO_SA_PWD);
         }
 
@@ -42,10 +42,10 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
             json: true
         };
 
-        console.log("Payload: ", options);
+        //console.log("Payload: ", options);
 
         return rp(options).then(function (data: any) {
-            //console.info(data);
+            console.info("Successfully logged in");
             return new MyTadoServiceAuthorization(data['access_token']);
         }).catch(function (err: any) {
             console.error(err["message"]);
@@ -54,44 +54,59 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
     }
 
 
-    async addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay> {
-        console.info("Adding overlay. Home=" + homeId + ", Zone=" + zoneId + ", T=" + temperature + " C, duration=" + duration + "s");
+    async addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, switchHeatingOn: boolean, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay> {
+        console.info("Adding overlay. Home=" + homeId + ", Zone=" + zoneId + ", SWITCH_ON=" + switchHeatingOn + ", T=" + temperature + " C, duration=" + duration + "s");
 
         var token: string = "";
         if(authToken == null) {
             console.warn("'authToken' is passed NULL");
         } else {
-            console.log("AuthToken: ", authToken);
+            //console.log("AuthToken: ", authToken);
             token = authToken.token;
-            console.log("Bearer token: ", token);
+            //console.log("Bearer token: ", token);
         }
 
-        const options = {
+        var options = {
             method: 'PUT',
             uri: 'https://my.tado.com/api/v2/homes/' + homeId + '/zones/' + zoneId + '/overlay',
             headers: {
                 Authorization: 'Bearer ' + token
             },
-            body: {
+            body: {},
+            json: true
+        };
+
+        if(switchHeatingOn) {
+            options.body = {
+                            setting: {
+                                type: "HEATING",
+                                power: "ON",
+                                temperature: {
+                                    celsius: temperature
+                                }
+                            },
+                            termination: {
+                                type: "TIMER",
+                                durationInSeconds: duration
+                            }
+                        };
+        } else {
+            options.body = {
                 setting: {
                     type: "HEATING",
-                    power: "ON",
-                    temperature: {
-                        celsius: temperature
-                    }
+                    power: "OFF"
                 },
                 termination: {
                     type: "TIMER",
                     durationInSeconds: duration
                 }
-            },
-            json: true
-        };
+            };
+}
 
-        console.log("Payload: ", options);
+        //console.log("Payload: ", options);
 
         return rp(options).then(function (data: any) {
-            //console.info(data);
+            console.info("Overlay successfully SET on zone ", zoneId);
             return new MyTadoOverlay();
         }).catch(function (err: any) {
             console.error(err["message"]);
@@ -105,9 +120,9 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
         if(authToken == null) {
             console.warn("'authToken' is passed NULL");
         } else {
-            console.log("AuthToken: ", authToken);
+            //console.log("AuthToken: ", authToken);
             token = authToken.token;
-            console.log("Bearer token: ", token);
+            //console.log("Bearer token: ", token);
         }
 
         const options = {
@@ -120,10 +135,10 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
             json: true
         };
 
-        console.log("Payload: ", options);
+        //console.log("Payload: ", options);
 
         return rp(options).then(function (data: any) {
-            //console.info(data);
+            console.info("Overlay successfully UNSET on zone ", zoneId);
             return new MyTadoOverlay();
         }).catch(function (err: any) {
             console.error(err["message"]);
