@@ -10,10 +10,24 @@
     margin-bottom: 5px;
 }
 
+.special-schedule-title, .command-action-icon {
+    color: #273271;
+}
+
+.command-action-icon-set {
+    color: #27712d;
+}
+
+.command-action-icon-unset {
+    color: #9c3846;   
+}
+
+.special-schedule-title {
+    text-decoration-line: none;
+}
+
 .command-action-icon {
-    font-size: 40px;
-    width: 70px;
-    color: #324090;
+    font-size: 35px;
 }
 
 .command-action-button {
@@ -34,6 +48,7 @@
 }
 
 div.action-icons-container {
+    margin-right: 10px;
 }
 
 .button-spacer {
