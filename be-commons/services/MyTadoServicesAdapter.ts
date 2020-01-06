@@ -2,6 +2,7 @@ import { IMyTadoOverlay } from "./"
 import { MyTadoOverlay } from "./MyTadoOverlay";
 import { MyTadoServiceAuthorization } from "./MyTadoServiceAuthorization";
 import { EnvironmentServices } from "./EnvironmentServices";
+import { IZone, Zone } from "../entities";
 
 //import { get, put, RequestPromiseOptions } from "request-promise"
 var rp = require('request-promise-native');
@@ -10,6 +11,7 @@ export interface IMyTadoServicesAdapter {
     login(user?: string, password?: string): Promise<MyTadoServiceAuthorization>;
     addTimedTemperatureOverlayForHomeAndZone(homeId: number, zoneId: number, switchHeatingOn: boolean, temperature: number, duration: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
     removeOverlayForHomeAndZone(homeId: number, zoneId: number, authToken: MyTadoServiceAuthorization): Promise<IMyTadoOverlay>;
+    getZonesIn(homeId: number, authToken: MyTadoServiceAuthorization): Promise<IZone[]>;
 }
 
 export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
@@ -17,11 +19,11 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
     private envServices: EnvironmentServices = new EnvironmentServices();
 
     async login(user?: string, password?: string): Promise<MyTadoServiceAuthorization> {
-        if(user == null || user == undefined || user === "") {
+        if (user == null || user == undefined || user === "") {
             //console.log("Username not passed, using env var", process.env);
             user = this.envServices.envVariable(process.env.MYTADO_SA_USER);
         }
-        if(password == null || password == undefined || password === "") {
+        if (password == null || password == undefined || password === "") {
             //console.log("Password not passed, using env var", process.env);
             password = this.envServices.envVariable(process.env.MYTADO_SA_PWD);
         }
@@ -58,7 +60,7 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
         console.info("Adding overlay. Home=" + homeId + ", Zone=" + zoneId + ", SWITCH_ON=" + switchHeatingOn + ", T=" + temperature + " C, duration=" + duration + "s");
 
         var token: string = "";
-        if(authToken == null) {
+        if (authToken == null) {
             console.warn("'authToken' is passed NULL");
         } else {
             //console.log("AuthToken: ", authToken);
@@ -76,20 +78,20 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
             json: true
         };
 
-        if(switchHeatingOn) {
+        if (switchHeatingOn) {
             options.body = {
-                            setting: {
-                                type: "HEATING",
-                                power: "ON",
-                                temperature: {
-                                    celsius: temperature
-                                }
-                            },
-                            termination: {
-                                type: "TIMER",
-                                durationInSeconds: duration
-                            }
-                        };
+                setting: {
+                    type: "HEATING",
+                    power: "ON",
+                    temperature: {
+                        celsius: temperature
+                    }
+                },
+                termination: {
+                    type: "TIMER",
+                    durationInSeconds: duration
+                }
+            };
         } else {
             options.body = {
                 setting: {
@@ -101,7 +103,7 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
                     durationInSeconds: duration
                 }
             };
-}
+        }
 
         //console.log("Payload: ", options);
 
@@ -117,7 +119,7 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
         console.info("Removing overlay. Home=" + homeId + ", Zone=" + zoneId);
 
         var token: string = "";
-        if(authToken == null) {
+        if (authToken == null) {
             console.warn("'authToken' is passed NULL");
         } else {
             //console.log("AuthToken: ", authToken);
@@ -144,4 +146,24 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
             console.error(err["message"]);
         });
     }
+
+    async getZonesIn(homeId: number, authToken: MyTadoServiceAuthorization): Promise<IZone[]> {
+        var token: string = authToken.token;
+
+        const options = {
+            method: 'GET',
+            uri: 'https://my.tado.com/api/v2/homes/' + homeId + '/zones',
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+            json: true
+        };
+
+        return rp(options).then(function (data: any) {
+            return data;
+        }).catch(function (err: any) {
+            console.error(err["message"]);
+        });
+    }
+
 }

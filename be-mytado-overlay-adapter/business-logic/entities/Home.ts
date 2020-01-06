@@ -1,10 +1,9 @@
-
-export interface IZone {
+export interface IHome {
     id: number;
     name: string;
 }
 
-export class Zone implements IZone {
+export class Home implements IHome {
     public id: number;
     public name: string;
 

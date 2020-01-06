@@ -1,5 +1,5 @@
 {
-  "name": "ep-ms-bq-core",
+  "name": "mytado-hacks-be-monitoring-adapter-standalone",
   "version": "0.0.0",
   "scripts": {
     "build": "node ./util/build.js",
@@ -15,6 +15,8 @@
     "@server": "dist/Server"
   },
   "dependencies": {
+    "mytado-hacks-be-commons": "file:../../be-commons",
+    "mytado-hacks-be-monitoring-adapter-bl": "file:../business-logic",
     "@google-cloud/bigquery": "^4.4.0",
     "cookie-parser": "^1.4.4",
     "cross-env": "^6.0.3",

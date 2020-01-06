@@ -5,8 +5,8 @@ import { BAD_REQUEST, CREATED, OK, PRECONDITION_FAILED } from 'http-status-codes
 import { paramMissingError } from '@shared';
 import { ParamsDictionary } from 'express-serve-static-core';
 
-import { doSaluteWorld, ISpecialSchedule, SpecialSchedule } from '../../../business-logic'
-import { SpecialSchedulesApllicationService } from '../../../business-logic'
+import { ISpecialSchedule, SpecialSchedule } from 'mytado-hacks-be-commons'
+import { SpecialSchedulesApllicationService } from 'mytado-hacks-be-overlay-adapter-bl'
 
 // Init shared
 const router = Router();

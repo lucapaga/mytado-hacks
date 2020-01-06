@@ -1,5 +1,5 @@
 {
-  "name": "be-mytado-monitoring-adapter-bl",
+  "name": "mytado-hacks-be-monitoring-adapter-bl",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
@@ -16,6 +16,7 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
+    "mytado-hacks-be-commons": "file:../../be-commons",
     "@types/request-promise-native": "^1.0.17",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"

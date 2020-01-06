@@ -1,7 +1,7 @@
 import { ISpecialScheduleRepository, SpecialScheduleRepository } from "../repositories"
-import { IMyTadoOverlay, IMyTadoServicesAdapter, MyTadoServicesAdapter } from "../services"
+import { IMyTadoOverlay, IMyTadoServicesAdapter, MyTadoServicesAdapter } from "mytado-hacks-be-commons"
 import { ISpecialSchedule } from "../entities/SpecialSchedule"
-import { MyTadoServiceAuthorization } from "../services/MyTadoServiceAuthorization";
+import { MyTadoServiceAuthorization } from "mytado-hacks-be-commons";
 
 export class SpecialSchedulesApllicationService {
     private specialScheduleRepository: ISpecialScheduleRepository = new SpecialScheduleRepository();
