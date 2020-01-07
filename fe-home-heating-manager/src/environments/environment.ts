@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  mthapisBaseUri: "/mthapis"
+  mthapisBaseUri: "/mth-specialschedule",
+  mthMonitoringBaseUri: "/mth-monitoring"
 };
 
 /*

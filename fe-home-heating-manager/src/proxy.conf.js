@@ -1,7 +1,7 @@
 const PROXY_CONFIG = [
     {
         context: [
-            "/mthapis"
+            "/mth-specialschedule"
         ],
         target: "http://localhost:3000",
         secure: false

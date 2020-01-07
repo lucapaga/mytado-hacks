@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 /**
  *  BASE URI PATH
  */
-app.use('/mthapis', BaseRouter);
+app.use('/mth-specialschedule', BaseRouter);
 
 /**
  * Point express to the 'views' directory. If you're using a

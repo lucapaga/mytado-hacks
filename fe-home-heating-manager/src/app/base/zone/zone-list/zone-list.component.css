@@ -3,6 +3,11 @@
     border-radius: 20px;
 }
 
+.zone-title {
+    text-decoration-line: none;
+    color: #273271;
+}
+
 .zone-list-card-avatar-box {}
 
 .zone-list-card-avatar-icon {}
