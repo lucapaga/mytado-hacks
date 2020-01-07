@@ -3,11 +3,28 @@
     border-radius: 20px;
 }
 
+.zone-list-zone-title-container, .zone-list-zone-kpis-container {
+    justify-content: left;
+    width: 100%;
+    margin-left: 10px;
+}
 .zone-title {
     text-decoration-line: none;
+    text-align: left;
     color: #273271;
+}
+
+.zone-list-zone-kpis-container {
+    font-size: 14px;
+    color: rgba(0,0,0,.54);
+}
+
+.zone-list-command-actions-container {
+
 }
 
 .zone-list-card-avatar-box {}
 
-.zone-list-card-avatar-icon {}
+.zone-list-card-avatar-icon {
+    font-size: 35px;
+}

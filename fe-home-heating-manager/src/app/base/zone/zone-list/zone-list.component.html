@@ -1,10 +1,30 @@
 <mat-card class="zone-list-card" *ngFor="let aZone of zoneList">
-    <mat-card-header>
-        <div mat-card-avatar class="zone-list-card-avatar-box">
-            <mat-icon aria-hidden="false" aria-label="Example heart icon" class="zone-list-card-avatar-icon">
-                aspect_ratio
-            </mat-icon>
-        </div>
-        <mat-card-title><a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a></mat-card-title>
-    </mat-card-header>
+    <mat-grid-list cols="6" rowHeight="20px">
+        <mat-grid-tile colspan="5">
+            <div class="zone-list-zone-title-container">
+                <a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a>
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile rowspan="2">
+            <div class="zone-list-command-actions-container">
+                <mat-icon aria-hidden="false" aria-label="Avvia/Ferma" class="command-action-icon command-action-icon-unset">power_settings_new</mat-icon>
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile colspan="5">
+            <div class="zone-list-zone-kpis-container">
+                #{{aZone.id}}
+            </div>
+        </mat-grid-tile>
+    </mat-grid-list>
+      
+    <!-- 
+        <mat-card-header>
+            <div mat-card-avatar class="zone-list-card-avatar-box">
+                <mat-icon aria-hidden="false" aria-label="Example heart icon" class="zone-list-card-avatar-icon">
+                    aspect_ratio
+                </mat-icon>
+            </div>
+            <mat-card-title><a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a></mat-card-title>
+        </mat-card-header>
+    -->
 </mat-card>
