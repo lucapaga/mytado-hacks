@@ -5,6 +5,13 @@ const PROXY_CONFIG = [
         ],
         target: "http://localhost:3000",
         secure: false
+    },
+    {
+        context: [
+            "/mth-monitoring"
+        ],
+        target: "http://localhost:3001",
+        secure: false
     }
 ]
 

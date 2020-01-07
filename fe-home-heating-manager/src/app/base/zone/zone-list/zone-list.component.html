@@ -1,0 +1,10 @@
+<mat-card class="zone-list-card" *ngFor="let aZone of zoneList">
+    <mat-card-header>
+        <div mat-card-avatar class="zone-list-card-avatar-box">
+            <mat-icon aria-hidden="false" aria-label="Example heart icon" class="zone-list-card-avatar-icon">
+                schedule
+            </mat-icon>
+        </div>
+        <mat-card-title><a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a></mat-card-title>
+    </mat-card-header>
+</mat-card>

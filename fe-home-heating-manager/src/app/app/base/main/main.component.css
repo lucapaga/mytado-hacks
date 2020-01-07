@@ -3,8 +3,9 @@
 }
 
 .main-toolbar-right-icon {
-    padding: 0 14px;
-    color: beige;
+    padding: 0 5px;
+    padding-top: 5px;
+    color: white;
 }
 
 .main-contentpane-container {
