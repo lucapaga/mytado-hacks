@@ -1,4 +1,5 @@
 #!/bin/bash
+cd ..
 cd ../be-commons
 npm i && npm run build
 cd ../business-logic
