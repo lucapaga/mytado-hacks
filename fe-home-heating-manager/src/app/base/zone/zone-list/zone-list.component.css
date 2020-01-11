@@ -28,3 +28,56 @@
 .zone-list-card-avatar-icon {
     font-size: 35px;
 }
+
+.current-temperature, .current-temperature-warm {
+    font-size: 55px;
+    position: absolute;
+    bottom: -10px;
+}
+.current-temperature-hot {
+    color: crimson;
+}
+.current-temperature-warm {
+    color: darkorange;
+}
+.current-temperature-cold {
+    color: darkblue;
+}
+
+.setting-value, .setting-label, .setting-timing {
+    font-size: 9px;
+    position: absolute;
+}
+.setting-value {
+    bottom: 2px;
+}
+.setting-label, .setting-timing {
+    top: 0px;
+}
+.setting-timing {
+    color: darkgreen;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.reference-value {
+    bottom: 1px;
+    font-size: 30px;
+    font-weight: 500;
+    color: forestgreen;
+}
+.secondary-value {
+    bottom: 3px;
+    font-size: 25px;
+    /*color: black;*/
+}
+
+.setting-label-tile {
+    margin-top: 10px;
+}
+.setting-value-tile {
+    margin-top: 5px;
+}
+.setting-timing-tile {
+    margin-top: 3px;
+}

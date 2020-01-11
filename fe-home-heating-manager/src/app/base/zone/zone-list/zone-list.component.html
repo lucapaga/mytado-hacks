@@ -1,30 +1,59 @@
 <mat-card class="zone-list-card" *ngFor="let aZone of zoneList">
-    <mat-grid-list cols="6" rowHeight="20px">
-        <mat-grid-tile colspan="5">
+    <mat-grid-list cols="5" rowHeight="20px">
+        <mat-grid-tile colspan="4">
             <div class="zone-list-zone-title-container">
                 <a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a>
             </div>
         </mat-grid-tile>
-        <mat-grid-tile rowspan="2">
-            <div class="zone-list-command-actions-container">
-                <mat-icon aria-hidden="false" aria-label="Avvia/Ferma" class="command-action-icon command-action-icon-unset">power_settings_new</mat-icon>
+        <mat-grid-tile colspan="2" class="setting-label-tile">
+            <div class="zone-list-zone-kpis-container setting-label">
+                CURRENT
             </div>
         </mat-grid-tile>
-        <mat-grid-tile colspan="5">
-            <div class="zone-list-zone-kpis-container">
-                #{{aZone.id}}
+        <mat-grid-tile rowspan="2" class="setting-label-tile">
+            <div class="zone-list-zone-kpis-container setting-label">
+                TARGET
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="setting-label-tile">
+            <div class="zone-list-zone-kpis-container setting-label">
+                NEXT
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="setting-label-tile">
+            <div class="zone-list-zone-kpis-container setting-label">
+                OVERLAY
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile colspan="2" rowspan="3">
+            <div class="zone-list-zone-kpis-container current-temperature current-temperature-warm">
+                21&deg;
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="setting-timing-tile">
+            <div class="zone-list-zone-kpis-container setting-timing">
+                (19:00)
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="setting-timing-tile">
+            <div class="zone-list-zone-kpis-container setting-timing">
+                (1h 10m)
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="setting-value-tile" rowspan="2">
+            <div class="zone-list-zone-kpis-container setting-value reference-value">
+                21&deg;
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="setting-value-tile" rowspan="2">
+            <div class="zone-list-zone-kpis-container setting-value secondary-value">
+                19&deg;
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile class="setting-value-tile" rowspan="2">
+            <div class="zone-list-zone-kpis-container setting-value secondary-value">
+                15&deg;
             </div>
         </mat-grid-tile>
     </mat-grid-list>
-      
-    <!-- 
-        <mat-card-header>
-            <div mat-card-avatar class="zone-list-card-avatar-box">
-                <mat-icon aria-hidden="false" aria-label="Example heart icon" class="zone-list-card-avatar-icon">
-                    aspect_ratio
-                </mat-icon>
-            </div>
-            <mat-card-title><a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a></mat-card-title>
-        </mat-card-header>
-    -->
 </mat-card>
