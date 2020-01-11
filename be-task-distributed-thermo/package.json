@@ -1,0 +1,21 @@
+{
+  "name": "be-task-distributed-thermo",
+  "version": "0.0.1",
+  "description": "dynamically set overlays to respect tempz set in every room",
+  "main": "index.js",
+  "scripts": {
+    "exec": "ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luca Paganelli",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^13.1.6",
+    "@types/request-promise-native": "^1.0.17",
+    "mytado-hacks-be-commons": "file:../npm be-commons",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.8",
+    "typescript": "^3.7.4",
+    "yargs": "^15.1.0"
+  }
+}
