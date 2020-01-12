@@ -5,6 +5,15 @@
                 <a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a>
             </div>
         </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-icon class="heating-power-icon" [ngClass]="{'active-heating': (aZone.telemetrics.heating), 'inactive-heating': (!aZone.telemetrics.heating)}">whatshot</mat-icon >
+            <div *ngIf="aZone.telemetrics.heating" class="zone-list-zone-title-container heating-power-value active-heating">
+                {{aZone.telemetrics.heatingPower | mthPercentage}}
+            </div>
+            <div *ngIf="!aZone.telemetrics.heating" class="zone-list-zone-title-container heating-power-value inactive-heating">
+                {{null | mthPercentage}}
+            </div>
+        </mat-grid-tile>
         <mat-grid-tile colspan="2" class="setting-label-tile">
             <div class="zone-list-zone-kpis-container setting-label">
                 CURRENT
@@ -26,33 +35,40 @@
             </div>
         </mat-grid-tile>
         <mat-grid-tile colspan="2" rowspan="3">
-            <div class="zone-list-zone-kpis-container current-temperature current-temperature-warm">
-                21&deg;
+            <div    class="zone-list-zone-kpis-container current-temperature current-temperature-warm"
+                    [ngClass]="{'current-temperature-cold': (aZone.telemetrics.temperature <= 17), 'current-temperature-warm': (aZone.telemetrics.temperature > 17 && aZone.telemetrics.temperature <= 20), 'current-temperature-hot': (aZone.telemetrics.temperature > 20)}">
+                {{aZone.telemetrics.temperature | mthTemperature}}
+            </div>
+            <div class="zone-list-zone-kpis-container current-humidity">
+                {{aZone.telemetrics.humidity | mthPercentage}}
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-timing-tile">
-            <div class="zone-list-zone-kpis-container setting-timing">
-                (19:00)
+            <div *ngIf="aZone.configuration != null" class="zone-list-zone-kpis-container setting-timing">
+              ({{ aZone.configuration?.nextChangeTime | date: "hh:mm" }})
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-timing-tile">
-            <div class="zone-list-zone-kpis-container setting-timing">
-                (1h 10m)
+            <div *ngIf="aZone.configuration?.overlayActive" class="zone-list-zone-kpis-container setting-timing">
+                ({{ aZone.configuration?.overlayDuration | mthDuration }})
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div class="zone-list-zone-kpis-container setting-value reference-value">
-                21&deg;
+            <div    class="zone-list-zone-kpis-container setting-value reference-value"
+                    [ngClass]="{'reference-value': isTargetTempAReferenceValue(aZone), 'secondary-value': !isTargetTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.targetTemperature | mthTemperature }}
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div class="zone-list-zone-kpis-container setting-value secondary-value">
-                19&deg;
+            <div class="zone-list-zone-kpis-container setting-value secondary-value"
+            [ngClass]="{'reference-value': isNextChangeTempAReferenceValue(aZone), 'secondary-value': !isNextChangeTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.nextChangeTemperature | mthTemperature }}
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div class="zone-list-zone-kpis-container setting-value secondary-value">
-                15&deg;
+            <div class="zone-list-zone-kpis-container setting-value secondary-value"
+            [ngClass]="{'reference-value': isOverlayTempAReferenceValue(aZone), 'secondary-value': !isOverlayTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.overlayTemperature | mthTemperature }}
             </div>
         </mat-grid-tile>
     </mat-grid-list>

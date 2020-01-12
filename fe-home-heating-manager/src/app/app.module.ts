@@ -18,6 +18,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { SpecialScheduleListComponent } from './base/special-schedule/special-schedule-list/special-schedule-list.component';
 import { SpecialScheduleDetailsComponent } from './base/special-schedule/special-schedule-details/special-schedule-details.component';
 import { ZoneListComponent } from './base/zone/zone-list/zone-list.component';
+import { MthTemperaturePipe } from './pipes/mth-temperature.pipe';
+import { MthDurationPipe } from './pipes/mth-duration.pipe';
+import { MthPercentagePipe } from './pipes/mth-percentage.pipe';
 
 
 @NgModule({
@@ -26,7 +29,10 @@ import { ZoneListComponent } from './base/zone/zone-list/zone-list.component';
     MainComponent,
     SpecialScheduleListComponent,
     SpecialScheduleDetailsComponent,
-    ZoneListComponent
+    ZoneListComponent,
+    MthTemperaturePipe,
+    MthDurationPipe,
+    MthPercentagePipe
   ],
   imports: [
     BrowserModule,
