@@ -2,7 +2,7 @@ import { IMyTadoOverlay } from "./"
 import { MyTadoOverlay } from "./MyTadoOverlay";
 import { MyTadoServiceAuthorization } from "./MyTadoServiceAuthorization";
 import { EnvironmentServices } from "./EnvironmentServices";
-import { IZone, Zone } from "../entities";
+import { IZone, Zone, IZoneDetails, ZoneDetails, ZoneMetrics, IZoneMetrics, IZoneConfiguration, ZoneConfiguration } from "../entities";
 
 //import { get, put, RequestPromiseOptions } from "request-promise"
 var rp = require('request-promise-native');
@@ -17,6 +17,14 @@ export interface IMyTadoServicesAdapter {
 export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
     private authToken: MyTadoServiceAuthorization | null = null;
     private envServices: EnvironmentServices = new EnvironmentServices();
+
+    private trueIf(extractedValue: string, referenceValue: string): boolean {
+        if(extractedValue == null || extractedValue === "") {
+            return false;
+        }
+
+        return extractedValue === referenceValue;
+    }
 
     async login(user?: string, password?: string): Promise<MyTadoServiceAuthorization> {
         if (user == null || user == undefined || user === "") {
@@ -161,6 +169,36 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
 
         return rp(options).then(function (data: any) {
             return data;
+        }).catch(function (err: any) {
+            console.error(err["message"]);
+        });
+    }
+
+    async getZoneTelemetricsAndConfiguration(homeId: number, zoneId: number, authToken: MyTadoServiceAuthorization): Promise<IZoneDetails> {
+        var token: string = authToken.token;
+
+        const options = {
+            method: 'GET',
+            uri: 'https://my.tado.com/api/v2/homes/' + homeId + '/zones/' + zoneId + "/state",
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+            json: true
+        };
+
+        var ceccia = this;
+        return rp(options).then(function (data: any) {
+            var retZone : IZoneDetails = new ZoneDetails();
+            
+            var zoneMetrics: IZoneMetrics = new ZoneMetrics();
+            zoneMetrics.linkActive = ceccia.trueIf(data["link"]["state"], "ONLINE");
+            zoneMetrics.metricsTimestamp = new Date();
+            retZone.metrics = zoneMetrics;
+
+            var zoneConf: IZoneConfiguration = new ZoneConfiguration();
+            retZone.configuration = zoneConf;
+
+            return retZone;
         }).catch(function (err: any) {
             console.error(err["message"]);
         });

@@ -39,6 +39,30 @@ router.get('/homes/:homeId/zones', async (req: Request, res: Response) => {
     }
 });
 
+/******************************************************************************
+ *  SOME OPERATION  "
+ ******************************************************************************/
+router.get('/homes/:homeId/zone/:zoneId', async (req: Request, res: Response) => {
+    try {
+        console.log("Request Parameters: ", req.params);
+        applicationService.getZoneTelemetricsAndConfiguration(+req.params['homeId'], +req.params['zoneId']).then(
+            (data) => { 
+                //const mytsa:MyTadoServicesZonesAdapter = new MyTadoServicesZonesAdapter();
+                return res.status(OK).json(data); 
+            }, 
+            (err) => {
+            return res.status(BAD_REQUEST).json({
+                error: err.message,
+            });
+        });
+    } catch (err) {
+        logger.error(err.message, err);
+        return res.status(BAD_REQUEST).json({
+            error: err.message,
+        });
+    }
+});
+
 
 /******************************************************************************
  *                                     Export
