@@ -193,9 +193,31 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
             var zoneMetrics: IZoneMetrics = new ZoneMetrics();
             zoneMetrics.linkActive = ceccia.trueIf(data["link"]["state"], "ONLINE");
             zoneMetrics.metricsTimestamp = new Date();
+            zoneMetrics.temperatureValue = +data["sensorDataPoints"]["insideTemperature"]["celsius"];
+            zoneMetrics.temperaturePrecision = +data["sensorDataPoints"]["insideTemperature"]["precision"]["celsius"];
+            zoneMetrics.humidityPercentage = +data["sensorDataPoints"]["humidity"]["percentage"];
+            zoneMetrics.heatingPowerPercentage = +data["activityDataPoints"]["heatingPower"]["percentage"];
+            zoneMetrics.windowOpen = false;
             retZone.metrics = zoneMetrics;
 
             var zoneConf: IZoneConfiguration = new ZoneConfiguration();
+            zoneConf.currentHeatingIsActive = ceccia.trueIf(data["setting"]["power"], "ON");
+            if(zoneConf.currentHeatingIsActive) {
+                //zoneConf.currentHeatingPower = +data["activityDataPoints"]["heatingPower"]["percentage"];
+                zoneConf.currentHeatingTargetTemperature = +data["setting"]["temperature"]["celsius"];
+            }
+            if(data["nextScheduleChange"] != null) {
+                zoneConf.nextChangeHeatingIsActive = ceccia.trueIf(data["nextScheduleChange"]["setting"]["power"], "ON");
+                //zoneConf.nextChangeHeatingPower = +data["nextScheduleChange"]["setting"]["power"]
+                zoneConf.nextChangeHeatingTargetTemperature = +data["nextScheduleChange"]["setting"]["temperature"]["celsius"];
+                zoneConf.nextChangeTimestamp = data["nextScheduleChange"]["start"];
+            }
+            if(data["overlay"] != null) {
+                zoneConf.overlayDuration = +data["overlay"]["setting"]["duration"];
+                zoneConf.overlayHeatingIsActive = ceccia.trueIf(data["overlay"]["setting"]["power"], "ON");
+                //zoneConf.overlayHeatingPower
+                zoneConf.overlayHeatingTargetTemperature = +data["overlay"]["setting"]["temperature"]["celsius"];
+            }
             retZone.configuration = zoneConf;
 
             return retZone;

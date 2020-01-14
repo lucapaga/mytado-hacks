@@ -5,6 +5,7 @@ export interface IZoneMetrics {
     temperatureValue?: number;
     temperaturePrecision?: number;
     humidityPercentage?: number;
+    windowOpen?: boolean;
 }
 
 export class ZoneMetrics implements IZoneMetrics {
@@ -14,4 +15,5 @@ export class ZoneMetrics implements IZoneMetrics {
     public temperatureValue?: number;
     public temperaturePrecision?: number;
     public humidityPercentage?: number;
+    public windowOpen?: boolean;
 }
