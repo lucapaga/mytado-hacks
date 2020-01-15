@@ -6,6 +6,7 @@ export class ZoneTelemetrics {
     public humidity?: number;
     public heating?: boolean;
     public heatingPower?: number;
+    public windowOpen?: boolean;
 
     constructor(temperature?: number, humidity?: number, heating?: boolean, heatingPower?: number, eventTime?: Date) {
         this.eventTime = eventTime;

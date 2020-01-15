@@ -65,13 +65,18 @@
     color: darkblue;
 }
 
-.current-humidity {
+.current-humidity, .current-temperature-decimalz {
     width: fit-content;
     left: 65px;
     position: absolute;
-    bottom: -1px;
     font-size: 18px;
+}
+.current-humidity {
     color: navy;
+    bottom: -1px;
+}
+.current-temperature-decimalz {
+    top: 15px;
 }
 
 .setting-value, .setting-label, .setting-timing {
@@ -80,6 +85,23 @@
 }
 .setting-value {
     bottom: 2px;
+}
+.setting-value-decimal, .setting-value-decimal-reference, .setting-value-decimal-secondary {
+    width: fit-content;
+    left: 45px;
+    top: 9px;
+    position: absolute;
+    font-size: 12px;
+}
+.setting-value-decimal-reference {
+    color: forestgreen;
+    top: 6px;
+    font-size: 18px;
+}
+.setting-value-decimal-secondary {
+    left: 38px;
+    top: 12px;
+    font-size: 14px;
 }
 .setting-label, .setting-timing {
     top: 0px;

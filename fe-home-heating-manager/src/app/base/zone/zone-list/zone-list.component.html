@@ -35,12 +35,16 @@
             </div>
         </mat-grid-tile>
         <mat-grid-tile colspan="2" rowspan="3">
-            <div    class="zone-list-zone-kpis-container current-temperature current-temperature-warm"
+            <div    class="zone-list-zone-kpis-container current-temperature"
                     [ngClass]="{'current-temperature-cold': (aZone.telemetrics.temperature <= 17), 'current-temperature-warm': (aZone.telemetrics.temperature > 17 && aZone.telemetrics.temperature <= 20), 'current-temperature-hot': (aZone.telemetrics.temperature > 20)}">
-                {{aZone.telemetrics.temperature | mthTemperature}}
+                {{aZone.telemetrics.temperature | mthTemperatureUnits}}
+            </div>
+            <div    class="zone-list-zone-kpis-container current-temperature-decimalz"
+                    [ngClass]="{'current-temperature-cold': (aZone.telemetrics.temperature <= 17), 'current-temperature-warm': (aZone.telemetrics.temperature > 17 && aZone.telemetrics.temperature <= 20), 'current-temperature-hot': (aZone.telemetrics.temperature > 20)}">
+                {{aZone.telemetrics.temperature | mthTemperatureDecimals:''}}
             </div>
             <div class="zone-list-zone-kpis-container current-humidity">
-                {{aZone.telemetrics.humidity | mthPercentage}}
+                {{aZone.telemetrics.humidity | mthPercentageUnits}}
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-timing-tile">
@@ -56,19 +60,31 @@
         <mat-grid-tile class="setting-value-tile" rowspan="2">
             <div    class="zone-list-zone-kpis-container setting-value reference-value"
                     [ngClass]="{'reference-value': isTargetTempAReferenceValue(aZone), 'secondary-value': !isTargetTempAReferenceValue(aZone)}">
-                {{ aZone.configuration?.targetTemperature | mthTemperature }}
+                {{ aZone.configuration?.targetTemperature | mthTemperatureUnits }}
+            </div>
+            <div    class="setting-value-decimal"
+                    [ngClass]="{'setting-value-decimal-reference': isTargetTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isTargetTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.targetTemperature | mthTemperatureDecimal:'' }}
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div class="zone-list-zone-kpis-container setting-value secondary-value"
-            [ngClass]="{'reference-value': isNextChangeTempAReferenceValue(aZone), 'secondary-value': !isNextChangeTempAReferenceValue(aZone)}">
-                {{ aZone.configuration?.nextChangeTemperature | mthTemperature }}
+            <div    class="zone-list-zone-kpis-container setting-value secondary-value"
+                    [ngClass]="{'reference-value': isNextChangeTempAReferenceValue(aZone), 'secondary-value': !isNextChangeTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.nextChangeTemperature | mthTemperatureUnits }}
+            </div>
+            <div    class="setting-value-decimal"
+                    [ngClass]="{'setting-value-decimal-reference': isNextChangeTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isNextChangeTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.nextChangeTemperature | mthTemperatureDecimal:'' }}
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div class="zone-list-zone-kpis-container setting-value secondary-value"
-            [ngClass]="{'reference-value': isOverlayTempAReferenceValue(aZone), 'secondary-value': !isOverlayTempAReferenceValue(aZone)}">
-                {{ aZone.configuration?.overlayTemperature | mthTemperature }}
+            <div    class="zone-list-zone-kpis-container setting-value secondary-value"
+                    [ngClass]="{'reference-value': isOverlayTempAReferenceValue(aZone), 'secondary-value': !isOverlayTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.overlayTemperature | mthTemperatureUnits }}
+            </div>
+            <div    class="setting-value-decimal"
+                    [ngClass]="{'setting-value-decimal-reference': isOverlayTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isOverlayTempAReferenceValue(aZone)}">
+                {{ aZone.configuration?.overlayTemperature | mthTemperatureDecimal:'' }}
             </div>
         </mat-grid-tile>
     </mat-grid-list>

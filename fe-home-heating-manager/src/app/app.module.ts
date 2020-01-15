@@ -21,6 +21,10 @@ import { ZoneListComponent } from './base/zone/zone-list/zone-list.component';
 import { MthTemperaturePipe } from './pipes/mth-temperature.pipe';
 import { MthDurationPipe } from './pipes/mth-duration.pipe';
 import { MthPercentagePipe } from './pipes/mth-percentage.pipe';
+import { MthTemperatureUnitsPipe } from './pipes/mth-temperature-units.pipe';
+import { MthTemperatureDecimalsPipe } from './pipes/mth-temperature-decimals.pipe';
+import { MthPercentageUnitsPipe } from './pipes/mth-percentage-units.pipe';
+import { MthTemperatureDecimalPipe } from './pipes/mth-temperature-decimal.pipe';
 
 
 @NgModule({
@@ -32,7 +36,11 @@ import { MthPercentagePipe } from './pipes/mth-percentage.pipe';
     ZoneListComponent,
     MthTemperaturePipe,
     MthDurationPipe,
-    MthPercentagePipe
+    MthPercentagePipe,
+    MthTemperatureUnitsPipe,
+    MthTemperatureDecimalsPipe,
+    MthPercentageUnitsPipe,
+    MthTemperatureDecimalPipe
   ],
   imports: [
     BrowserModule,

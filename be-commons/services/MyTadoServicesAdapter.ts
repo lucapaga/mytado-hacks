@@ -188,6 +188,8 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
 
         var ceccia = this;
         return rp(options).then(function (data: any) {
+            console.log("Analiizing response", data);
+
             var retZone : IZoneDetails = new ZoneDetails();
             
             var zoneMetrics: IZoneMetrics = new ZoneMetrics();
@@ -213,7 +215,7 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
                 zoneConf.nextChangeTimestamp = data["nextScheduleChange"]["start"];
             }
             if(data["overlay"] != null) {
-                zoneConf.overlayDuration = +data["overlay"]["setting"]["duration"];
+                zoneConf.overlayDuration = +data["overlay"]["termination"]["remainingTimeInSeconds"];
                 zoneConf.overlayHeatingIsActive = ceccia.trueIf(data["overlay"]["setting"]["power"], "ON");
                 //zoneConf.overlayHeatingPower
                 zoneConf.overlayHeatingTargetTemperature = +data["overlay"]["setting"]["temperature"]["celsius"];
