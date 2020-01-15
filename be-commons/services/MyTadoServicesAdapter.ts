@@ -188,37 +188,60 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
 
         var ceccia = this;
         return rp(options).then(function (data: any) {
-            console.log("Analiizing response", data);
+            //console.log("Analiizing response", data);
 
             var retZone : IZoneDetails = new ZoneDetails();
             
             var zoneMetrics: IZoneMetrics = new ZoneMetrics();
             zoneMetrics.linkActive = ceccia.trueIf(data["link"]["state"], "ONLINE");
             zoneMetrics.metricsTimestamp = new Date();
-            zoneMetrics.temperatureValue = +data["sensorDataPoints"]["insideTemperature"]["celsius"];
-            zoneMetrics.temperaturePrecision = +data["sensorDataPoints"]["insideTemperature"]["precision"]["celsius"];
-            zoneMetrics.humidityPercentage = +data["sensorDataPoints"]["humidity"]["percentage"];
-            zoneMetrics.heatingPowerPercentage = +data["activityDataPoints"]["heatingPower"]["percentage"];
+            if(data["sensorDataPoints"] != null && data["sensorDataPoints"]["insideTemperature"] != null) {
+                zoneMetrics.temperatureValue = +data["sensorDataPoints"]["insideTemperature"]["celsius"];
+                if(data["sensorDataPoints"]["insideTemperature"]["precision"] != null) {
+                    zoneMetrics.temperaturePrecision = +data["sensorDataPoints"]["insideTemperature"]["precision"]["celsius"];
+                }
+                if(data["sensorDataPoints"]["humidity"] != null) {
+                    zoneMetrics.humidityPercentage = +data["sensorDataPoints"]["humidity"]["percentage"];
+                }
+            }
+            if(data["activityDataPoints"] != null && data["activityDataPoints"]["heatingPower"] != null) {
+                zoneMetrics.heatingPowerPercentage = +data["activityDataPoints"]["heatingPower"]["percentage"];
+            }
             zoneMetrics.windowOpen = false;
             retZone.metrics = zoneMetrics;
 
             var zoneConf: IZoneConfiguration = new ZoneConfiguration();
             zoneConf.currentHeatingIsActive = ceccia.trueIf(data["setting"]["power"], "ON");
-            if(zoneConf.currentHeatingIsActive) {
+            if(zoneConf.currentHeatingIsActive && zoneMetrics!= null && zoneMetrics.heatingPowerPercentage != null && zoneMetrics.heatingPowerPercentage > 0) {
+                zoneConf.currentHeatingIsActive = true;
+            } else {
+                zoneConf.currentHeatingIsActive = false;
+            }
+            if(data["setting"] != null && data["setting"]["temperature"] != null) {
                 //zoneConf.currentHeatingPower = +data["activityDataPoints"]["heatingPower"]["percentage"];
                 zoneConf.currentHeatingTargetTemperature = +data["setting"]["temperature"]["celsius"];
             }
             if(data["nextScheduleChange"] != null) {
-                zoneConf.nextChangeHeatingIsActive = ceccia.trueIf(data["nextScheduleChange"]["setting"]["power"], "ON");
-                //zoneConf.nextChangeHeatingPower = +data["nextScheduleChange"]["setting"]["power"]
-                zoneConf.nextChangeHeatingTargetTemperature = +data["nextScheduleChange"]["setting"]["temperature"]["celsius"];
+                if(data["nextScheduleChange"]["setting"] != null) {
+                    zoneConf.nextChangeHeatingIsActive = ceccia.trueIf(data["nextScheduleChange"]["setting"]["power"], "ON");
+                    //zoneConf.nextChangeHeatingPower = +data["nextScheduleChange"]["setting"]["power"]
+                    if(data["nextScheduleChange"]["setting"]["temperature"] != null) {
+                        zoneConf.nextChangeHeatingTargetTemperature = +data["nextScheduleChange"]["setting"]["temperature"]["celsius"];
+                    }
+                }
                 zoneConf.nextChangeTimestamp = data["nextScheduleChange"]["start"];
             }
             if(data["overlay"] != null) {
-                zoneConf.overlayDuration = +data["overlay"]["termination"]["remainingTimeInSeconds"];
-                zoneConf.overlayHeatingIsActive = ceccia.trueIf(data["overlay"]["setting"]["power"], "ON");
-                //zoneConf.overlayHeatingPower
-                zoneConf.overlayHeatingTargetTemperature = +data["overlay"]["setting"]["temperature"]["celsius"];
+                if(data["overlay"]["termination"] != null) {
+                    zoneConf.overlayDuration = +data["overlay"]["termination"]["remainingTimeInSeconds"];
+                }
+                if(data["overlay"]["setting"] != null) {
+                    zoneConf.overlayHeatingIsActive = ceccia.trueIf(data["overlay"]["setting"]["power"], "ON");
+                    //zoneConf.overlayHeatingPower
+                    if(data["overlay"]["setting"]["temperature"] != null) {
+                        zoneConf.overlayHeatingTargetTemperature = +data["overlay"]["setting"]["temperature"]["celsius"];
+                    }
+                }
             }
             retZone.configuration = zoneConf;
 
