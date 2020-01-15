@@ -5,7 +5,7 @@ export class MyTadoServicesZonesAdapter {
         if (httpData != null) { 
             var retZones: IZone[] = [];
             httpData.forEach((aDataElement:any) => {
-                retZones.push(new Zone(+aDataElement["id"], aDataElement["name"], aDataElement["type"]));
+                retZones.push(new Zone(+aDataElement["id"], aDataElement["name"], aDataElement["type"], aDataElement["devices"][0]["batteryState"]));
             });
             return retZones;
         }

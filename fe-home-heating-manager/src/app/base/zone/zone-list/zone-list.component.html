@@ -5,7 +5,13 @@
                 <a routerLink="/zones/{{aZone.id}}" class="zone-title">{{aZone.name}}</a>
             </div>
         </mat-grid-tile>
-        <mat-grid-tile>
+        <mat-grid-tile colspan="1">
+            <!--  
+                <mat-icon class="battery-power-icon" [ngClass]="{'battery-full': (aZone.batteryState != 'NORMAL'), 'battery-alert': (aZone.batteryState === 'NORMAL')}">battery_full</mat-icon>
+            -->
+            <mat-icon class="battery-power-icon battery-full" *ngIf="aZone.batteryState === 'NORMAL'">battery_full</mat-icon>
+            <mat-icon class="battery-power-icon battery-alert" *ngIf="aZone.batteryState != 'NORMAL'">battery_alert</mat-icon>
+
             <mat-icon class="heating-power-icon" [ngClass]="{'active-heating': (aZone.telemetrics.heating), 'inactive-heating': (!aZone.telemetrics.heating)}">whatshot</mat-icon >
             <div *ngIf="aZone.telemetrics.heating" class="zone-list-zone-title-container heating-power-value active-heating">
                 {{aZone.telemetrics.heatingPower | mthPercentage}}

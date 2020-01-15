@@ -31,7 +31,7 @@
     font-size: 35px;
 }
 
-.heating-power-icon {
+.heating-power-icon, .battery-power-icon {
     font-size: 20px;
 }
 .heating-power-value {
@@ -44,6 +44,12 @@
 }
 .inactive-heating {
     color: lightgrey;
+}
+.battery-full {
+    color: darkseagreen;
+}
+.battery-alert {
+    color: crimson;
 }
 
 .current-temperature, .current-humidity {
