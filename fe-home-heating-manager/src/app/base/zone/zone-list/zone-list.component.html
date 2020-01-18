@@ -1,4 +1,4 @@
-<mat-card class="zone-list-card" *ngFor="let aZone of zoneList">
+<mat-card class="zone-list-card" *ngFor="let aZone of zoneList" [ngClass]="{'zone-list-card-off': isOff(aZone)}">
     <mat-grid-list cols="5" rowHeight="20px">
         <mat-grid-tile colspan="4">
             <div class="zone-list-zone-title-container">
@@ -9,8 +9,11 @@
             <!--  
                 <mat-icon class="battery-power-icon" [ngClass]="{'battery-full': (aZone.batteryState != 'NORMAL'), 'battery-alert': (aZone.batteryState === 'NORMAL')}">battery_full</mat-icon>
             -->
-            <mat-icon class="battery-power-icon battery-full" *ngIf="aZone.batteryState === 'NORMAL'">battery_full</mat-icon>
-            <mat-icon class="battery-power-icon battery-alert" *ngIf="aZone.batteryState != 'NORMAL'">battery_alert</mat-icon>
+            <mat-icon class="battery-power-icon battery-full" *ngIf="showBatteryFullIcon(aZone)">battery_full</mat-icon>
+            <mat-icon class="battery-power-icon battery-alert" *ngIf="showBatteryWarningIcon(aZone)">battery_alert</mat-icon>
+
+            <mat-icon class="window-open-icon window-open" *ngIf="showWindowOpenIcon(aZone)">meeting_room</mat-icon>
+            <mat-icon class="window-open-icon window-not-open" *ngIf="showWindowNotOpenIcon(aZone)">meeting_room</mat-icon>
 
             <mat-icon class="heating-power-icon" [ngClass]="{'active-heating': (aZone.telemetrics.heating), 'inactive-heating': (!aZone.telemetrics.heating)}">whatshot</mat-icon >
             <div *ngIf="aZone.telemetrics.heating" class="zone-list-zone-title-container heating-power-value active-heating">
@@ -54,43 +57,75 @@
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-timing-tile">
-            <div *ngIf="aZone.configuration != null" class="zone-list-zone-kpis-container setting-timing">
-              ({{ aZone.configuration?.nextChangeTime | date: "hh:mm" }})
+            <div *ngIf="aZone.configuration != null && aZone.configuration.nextChangePresent" class="zone-list-zone-kpis-container setting-timing">
+                ({{ aZone.configuration?.nextChangeTime | date: "hh:mm" }})
             </div>
-        </mat-grid-tile>
+            <div *ngIf="aZone.configuration == null || !aZone.configuration.nextChangePresent" class="zone-list-zone-kpis-container setting-timing unset-next-change">
+                (NOT SET)
+            </div>
+          </mat-grid-tile>
         <mat-grid-tile class="setting-timing-tile">
-            <div *ngIf="aZone.configuration?.overlayActive" class="zone-list-zone-kpis-container setting-timing">
+            <div *ngIf="aZone.configuration?.overlayPresent && aZone.configuration?.overlayActive" class="zone-list-zone-kpis-container setting-timing">
                 ({{ aZone.configuration?.overlayDuration | mthDuration }})
+            </div>
+            <div *ngIf="aZone.configuration == null || !aZone.configuration.overlayPresent" class="zone-list-zone-kpis-container setting-timing unset-next-change">
+                (NOT SET)
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div    class="zone-list-zone-kpis-container setting-value reference-value"
-                    [ngClass]="{'reference-value': isTargetTempAReferenceValue(aZone), 'secondary-value': !isTargetTempAReferenceValue(aZone)}">
+            <div    class="zone-list-zone-kpis-container setting-value"
+                    [ngClass]="{'reference-value': isTargetTempAReferenceValue(aZone), 'secondary-value': !isTargetTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration != null && aZone.configuration.heating">
                 {{ aZone.configuration?.targetTemperature | mthTemperatureUnits }}
             </div>
             <div    class="setting-value-decimal"
-                    [ngClass]="{'setting-value-decimal-reference': isTargetTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isTargetTempAReferenceValue(aZone)}">
+                    [ngClass]="{'setting-value-decimal-reference': isTargetTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isTargetTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration != null && aZone.configuration.heating">
                 {{ aZone.configuration?.targetTemperature | mthTemperatureDecimal:'' }}
+            </div>
+            <div    class="zone-list-zone-kpis-container setting-value off-value"
+                    [ngClass]="{'reference-value': isTargetTempAReferenceValue(aZone), 'secondary-value': !isTargetTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration == null || !aZone.configuration.heating">
+                OFF
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div    class="zone-list-zone-kpis-container setting-value secondary-value"
-                    [ngClass]="{'reference-value': isNextChangeTempAReferenceValue(aZone), 'secondary-value': !isNextChangeTempAReferenceValue(aZone)}">
+            <div    class="zone-list-zone-kpis-container setting-value"
+                    [ngClass]="{'reference-value': isNextChangeTempAReferenceValue(aZone), 'secondary-value': !isNextChangeTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration != null && aZone.configuration.nextChangePresent && aZone.configuration.nextChangeHeating">
                 {{ aZone.configuration?.nextChangeTemperature | mthTemperatureUnits }}
             </div>
             <div    class="setting-value-decimal"
-                    [ngClass]="{'setting-value-decimal-reference': isNextChangeTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isNextChangeTempAReferenceValue(aZone)}">
+                    [ngClass]="{'setting-value-decimal-reference': isNextChangeTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isNextChangeTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration != null && aZone.configuration.nextChangePresent && aZone.configuration.nextChangeHeating">
                 {{ aZone.configuration?.nextChangeTemperature | mthTemperatureDecimal:'' }}
+            </div>
+            <div    class="zone-list-zone-kpis-container setting-value off-value"
+                    [ngClass]="{'reference-value': isNextChangeTempAReferenceValue(aZone), 'secondary-value': !isNextChangeTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration == null || !(aZone.configuration.nextChangePresent && aZone.configuration.nextChangeHeating)">
+                OFF
             </div>
         </mat-grid-tile>
         <mat-grid-tile class="setting-value-tile" rowspan="2">
-            <div    class="zone-list-zone-kpis-container setting-value secondary-value"
-                    [ngClass]="{'reference-value': isOverlayTempAReferenceValue(aZone), 'secondary-value': !isOverlayTempAReferenceValue(aZone)}">
+            <div    class="zone-list-zone-kpis-container setting-value"
+                    [ngClass]="{'reference-value': isOverlayTempAReferenceValue(aZone), 'secondary-value': !isOverlayTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration != null && aZone.configuration.overlayPresent && aZone.configuration.overlayHeating">
                 {{ aZone.configuration?.overlayTemperature | mthTemperatureUnits }}
             </div>
             <div    class="setting-value-decimal"
-                    [ngClass]="{'setting-value-decimal-reference': isOverlayTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isOverlayTempAReferenceValue(aZone)}">
+                    [ngClass]="{'setting-value-decimal-reference': isOverlayTempAReferenceValue(aZone), 'setting-value-decimal-secondary': !isOverlayTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration != null && aZone.configuration.overlayPresent && aZone.configuration.overlayHeating">
                 {{ aZone.configuration?.overlayTemperature | mthTemperatureDecimal:'' }}
+            </div>
+            <div    class="zone-list-zone-kpis-container setting-value off-value"
+                    [ngClass]="{'reference-value': isOverlayTempAReferenceValue(aZone), 'secondary-value': !isOverlayTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration == null || (aZone.configuration.overlayPresent && !aZone.configuration.overlayHeating)">
+                OFF
+            </div>
+            <div    class="zone-list-zone-kpis-container setting-value off-value"
+                    [ngClass]="{'reference-value': isOverlayTempAReferenceValue(aZone), 'secondary-value': !isOverlayTempAReferenceValue(aZone)}"
+                    *ngIf="aZone.configuration != null && !aZone.configuration.overlayPresent">
+                - -
             </div>
         </mat-grid-tile>
     </mat-grid-list>

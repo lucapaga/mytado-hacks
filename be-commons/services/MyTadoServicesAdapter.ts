@@ -207,7 +207,12 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
             if(data["activityDataPoints"] != null && data["activityDataPoints"]["heatingPower"] != null) {
                 zoneMetrics.heatingPowerPercentage = +data["activityDataPoints"]["heatingPower"]["percentage"];
             }
+
             zoneMetrics.windowOpen = false;
+            if(data["openWindowDetected"] != null && data["openWindowDetected"]) {
+                zoneMetrics.windowOpen = true;
+            }
+
             retZone.metrics = zoneMetrics;
 
             var zoneConf: IZoneConfiguration = new ZoneConfiguration();
@@ -222,6 +227,7 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
                 zoneConf.currentHeatingTargetTemperature = +data["setting"]["temperature"]["celsius"];
             }
             if(data["nextScheduleChange"] != null) {
+                zoneConf.nextChangePresent = true;
                 if(data["nextScheduleChange"]["setting"] != null) {
                     zoneConf.nextChangeHeatingIsActive = ceccia.trueIf(data["nextScheduleChange"]["setting"]["power"], "ON");
                     //zoneConf.nextChangeHeatingPower = +data["nextScheduleChange"]["setting"]["power"]
@@ -230,8 +236,11 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
                     }
                 }
                 zoneConf.nextChangeTimestamp = data["nextScheduleChange"]["start"];
+            } else {
+                zoneConf.nextChangePresent = false;
             }
             if(data["overlay"] != null) {
+                zoneConf.overlayPresent = true;
                 if(data["overlay"]["termination"] != null) {
                     zoneConf.overlayDuration = +data["overlay"]["termination"]["remainingTimeInSeconds"];
                 }
@@ -242,6 +251,8 @@ export class MyTadoServicesAdapter implements IMyTadoServicesAdapter {
                         zoneConf.overlayHeatingTargetTemperature = +data["overlay"]["setting"]["temperature"]["celsius"];
                     }
                 }
+            } else {
+                zoneConf.overlayPresent = false;
             }
             retZone.configuration = zoneConf;
 

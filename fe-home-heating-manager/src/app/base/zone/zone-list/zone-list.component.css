@@ -2,6 +2,9 @@
     margin: 12px;
     border-radius: 20px;
 }
+.zone-list-card-off {
+    background-color: initial; 
+}
 
 .zone-list-zone-title-container, .zone-list-zone-kpis-container {
     justify-content: left;
@@ -31,7 +34,7 @@
     font-size: 35px;
 }
 
-.heating-power-icon, .battery-power-icon {
+.heating-power-icon, .battery-power-icon, .window-open-icon {
     font-size: 20px;
 }
 .heating-power-value {
@@ -42,13 +45,13 @@
 .active-heating {
     color: darkgoldenrod;
 }
-.inactive-heating {
+.inactive-heating, .window-not-open {
     color: lightgrey;
 }
 .battery-full {
     color: darkseagreen;
 }
-.battery-alert {
+.battery-alert, .window-open {
     color: crimson;
 }
 
@@ -112,10 +115,13 @@
 .setting-label, .setting-timing {
     top: 0px;
 }
-.setting-timing {
+.setting-timing, .unset-next-change {
     color: darkgreen;
     font-weight: bold;
     font-size: 8px;
+}
+.unset-next-change {
+    color: rgba(0,0,0,.54);
 }
 
 .reference-value {
@@ -129,6 +135,9 @@
     font-size: 25px;
     font-weight: 100;
     /*color: black;*/
+}
+.off-value {
+    font-size: 24px;
 }
 
 .setting-label-tile {

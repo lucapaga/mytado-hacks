@@ -31,27 +31,74 @@ export class ZoneListComponent implements OnInit {
     );
   }
 
-  isTargetTempAReferenceValue(zone: Zone) {
-    if(!this.isOverlayTempAReferenceValue(zone) && !this.isNextChangeTempAReferenceValue(zone)) {
-      if(zone != null && zone.configuration != null && zone.configuration.targetTemperature != null && zone.configuration.targetTemperature > 0) {
-        return true;
+  showEitherBatteryOrWindowOpenIcon(zone: Zone): string {
+    if(zone != null && zone.configuration != null && zone.telemetrics != null) {
+      if(zone.batteryState != null && zone.batteryState != "NORMAL") {
+        return "BATTERY";
+      } else {
+        if(zone.telemetrics != null && zone.telemetrics.windowOpen != null && zone.telemetrics.windowOpen) {
+          return "WINDOW";
+        } else {
+          return "BOTH";
+        }
       }
+    } else {
+      return "NONE";
+    }
+  }
+
+  showBatteryFullIcon(zone: Zone): boolean {
+    return (
+      (this.showEitherBatteryOrWindowOpenIcon(zone) === 'BATTERY' || this.showEitherBatteryOrWindowOpenIcon(zone) === 'BATTERY') 
+      && zone.batteryState === 'NORMAL'
+    );
+  }
+  showBatteryWarningIcon(zone: Zone): boolean {
+    return (
+      (this.showEitherBatteryOrWindowOpenIcon(zone) === 'BATTERY' || this.showEitherBatteryOrWindowOpenIcon(zone) === 'BOTH') 
+      && zone.batteryState != 'NORMAL'
+    );
+  }
+  showWindowNotOpenIcon(zone: Zone): boolean {
+    return (
+      (this.showEitherBatteryOrWindowOpenIcon(zone) === 'WINDOW' || this.showEitherBatteryOrWindowOpenIcon(zone) === 'BOTH') 
+      && 
+      (zone.telemetrics.windowOpen == null || !zone.telemetrics.windowOpen)
+    );
+  }
+  showWindowOpenIcon(zone: Zone): boolean {
+    return (
+      (this.showEitherBatteryOrWindowOpenIcon(zone) === 'WINDOW' || this.showEitherBatteryOrWindowOpenIcon(zone) === 'BOTH') 
+      && zone.telemetrics.windowOpen != null && zone.telemetrics.windowOpen
+    );
+  }
+
+  isTargetTempAReferenceValue(zone: Zone) {
+    if(!this.isOverlayTempAReferenceValue(zone)) {// && !this.isNextChangeTempAReferenceValue(zone)) {
+      //if(zone != null && zone.configuration != null && zone.configuration.targetTemperature != null && zone.configuration.targetTemperature > 0) {
+        return true;
+      //}
     }
     return false;
   }
   isNextChangeTempAReferenceValue(zone: Zone) {
+    /*
     if(!this.isOverlayTempAReferenceValue(zone)) {
       if(zone != null && zone.configuration != null && zone.configuration.nextChangeTemperature != null && zone.configuration.nextChangeTemperature > 0) {
         return true;
       }
-      }
+    }
+    */
     return false;
   }
   isOverlayTempAReferenceValue(zone: Zone) {
-    if(zone != null && zone.configuration != null && zone.configuration.overlayActive && zone.configuration.overlayTemperature != null && zone.configuration.overlayTemperature > 0) {
+    if(zone != null && zone.configuration != null && zone.configuration.overlayPresent) {
       return true;
     }
     return false;
   }
 
+  isOff(zone: Zone) {
+    return !(zone != null && zone.configuration != null && zone.configuration.heating);
+  }
 }

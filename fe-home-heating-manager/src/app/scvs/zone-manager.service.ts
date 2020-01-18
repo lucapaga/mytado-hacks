@@ -31,9 +31,11 @@ export class ZoneManagerService {
                                 //var azd: ZoneDetails = new ZoneDetails();
                                 aZone.configuration = new ZoneConfiguration();
                                 aZone.configuration.heating = aDetail.configuration.currentHeatingIsActive;
+                                aZone.configuration.nextChangePresent = aDetail.configuration.nextChangePresent;
                                 aZone.configuration.nextChangeHeating = aDetail.configuration.nextChangeHeatingIsActive;
                                 aZone.configuration.nextChangeTemperature = aDetail.configuration.nextChangeHeatingTargetTemperature;
                                 aZone.configuration.nextChangeTime = aDetail.configuration.nextChangeTimestamp;
+                                aZone.configuration.overlayPresent = aDetail.configuration.overlayPresent;
                                 aZone.configuration.overlayDuration = aDetail.configuration.overlayDuration;
                                 aZone.configuration.overlayActive = (aZone.configuration.overlayDuration > 0);
                                 aZone.configuration.overlayHeating = aDetail.configuration.overlayHeatingIsActive;

@@ -2,9 +2,11 @@
 export class ZoneConfiguration {
     public heating?: boolean;
     public targetTemperature?: number;
+    public nextChangePresent?: boolean;
     public nextChangeTime?: Date;
     public nextChangeHeating?: boolean;
     public nextChangeTemperature?: number;
+    public overlayPresent?: boolean;
     public overlayActive?: boolean;
     public overlayDuration?: number;
     public overlayHeating?: boolean;
