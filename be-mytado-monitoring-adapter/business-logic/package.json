@@ -6,7 +6,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install-ext": "cp -r ../../be-commons ./ && npm i",
+    "clean-and-install-ext": "rm -rf ./be-commons && cp -r ../../be-commons ./ && npm i",
+    "install-ext-win": "xcopy /s /e /q ..\\..\\be-commons be-commons && npm i",
+    "clean-and-install-ext-win": "rmdir /s /q be-commons && md be-commons && xcopy /s /e /q ..\\..\\be-commons be-commons && npm i"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +20,7 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
-    "mytado-hacks-be-commons": "file:../../be-commons",
+    "mytado-hacks-be-commons": "file:./be-commons",
     "@types/request-promise-native": "^1.0.17",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"

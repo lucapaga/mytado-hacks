@@ -16,8 +16,8 @@
     "system-test": "mocha test/*system*test.js --timeout=600000 --exit",
     "test": "npm run unit-test",
     "install-ext": "cp -r ../../be-commons ./ && cp -r ../business-logic ./ && npm i",
-    "install-ext-win": "xcopy /s /e /q ..\\..\\be-commons be-commons && xcopy /s /e /q ..\\business-logic business-logic",
-    "clean-and-install-ext-win": "rmdir /s /q be-commons && md be-commons && xcopy /s /e /q ..\\..\\be-commons be-commons && rmdir /s /q business-logic && md business-logic && xcopy /s /e /q ..\\business-logic business-logic"
+    "install-ext-win": "xcopy /s /e /q ..\\..\\be-commons be-commons && xcopy /s /e /q ..\\business-logic business-logic && npm i",
+    "clean-and-install-ext-win": "rmdir /s /q be-commons && md be-commons && xcopy /s /e /q ..\\..\\be-commons be-commons && rmdir /s /q business-logic && md business-logic && xcopy /s /e /q ..\\business-logic business-logic && npm i"
   },
   "dependencies": {
     "@google-cloud/debug-agent": "^4.0.0",
