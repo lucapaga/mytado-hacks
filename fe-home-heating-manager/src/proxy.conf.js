@@ -15,4 +15,16 @@ const PROXY_CONFIG = [
     }
 ]
 
+/*
+,
+    {
+        context: [
+            "/oauth"
+        ],
+        target: "https://auth.tado.com/",
+        secure: true,
+        changeOrigin: true,
+        logLevel: "debug"
+    }
+*/
 module.exports = PROXY_CONFIG;

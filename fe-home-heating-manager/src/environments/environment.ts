@@ -5,8 +5,11 @@
 export const environment = {
   production: false,
   mthapisBaseUri: "/mth-specialschedule",
-  mthMonitoringBaseUri: "/mth-monitoring"
+  mthMonitoringBaseUri: "https://europe-west1-luca-paganelli-formazione.cloudfunctions.net/mthMonitoring",
+  mytadoAuthURI: "/oauth/token"
 };
+
+//mytadoAuthURI: "https://auth.tado.com/oauth/token"
 
 /*
  * For easier debugging in development mode, you can import the following file

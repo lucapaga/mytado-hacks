@@ -1,0 +1,32 @@
+{
+  "name": "functions",
+  "scripts": {
+    "lint": "tslint --project tsconfig.json",
+    "build": "tsc",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "install-ext": "cp -r ../../../be-commons ./ && cp -r ../../business-logic ./ && npm i",
+    "install-ext-win": "xcopy /s /e /q ..\\..\\..\\be-commons be-commons && xcopy /s /e /q ..\\..\\business-logic business-logic && npm i",
+    "clean-and-install-ext-win": "rmdir /s /q be-commons && md be-commons && xcopy /s /e /q ..\\..\\..\\be-commons be-commons && rmdir /s /q business-logic && md business-logic && xcopy /s /e /q ..\\..\\business-logic business-logic && npm i"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^8.6.0",
+    "firebase-functions": "^3.3.0",
+    "mytado-hacks-be-commons": "file:./be-commons",
+    "mytado-hacks-be-monitoring-adapter-bl": "file:./business-logic",
+    "path-to-regexp": "^6.1.0"
+  },
+  "devDependencies": {
+    "tslint": "^5.12.0",
+    "typescript": "^3.2.2",
+    "firebase-functions-test": "^0.1.6"
+  },
+  "private": true
+}
