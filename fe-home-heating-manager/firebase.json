@@ -11,9 +11,15 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [ {
-      "source": "**",
-      "destination": "/index.html"
-    } ]
+    "rewrites": [
+      {
+        "source": "/mthMonitoring/**",
+        "function": "mthMonitoring"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }

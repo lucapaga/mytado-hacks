@@ -5,10 +5,13 @@
 export const environment = {
   production: false,
   mthapisBaseUri: "/mth-specialschedule",
-  mthMonitoringBaseUri: "https://europe-west1-luca-paganelli-formazione.cloudfunctions.net/mthMonitoring",
+  mthMonitoringBaseUri: "/mthMonitoring",
   mytadoAuthURI: "/oauth/token"
 };
 
+//mthMonitoringBaseUri: "/mth-monitoring",
+//mthMonitoringBaseUri: "/mthMonitoring",
+//mthMonitoringBaseUri: "/mthMonitoringFB",
 //mytadoAuthURI: "https://auth.tado.com/oauth/token"
 
 /*

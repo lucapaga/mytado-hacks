@@ -8,23 +8,33 @@ const { MyTadoMonitoringServices, MyTadoServicesZonesAdapter } = require('mytado
 
 
 exports.mthMonitoring = (req, res) => {
-  const matchZones = match("/homes/:homeId/zones", { decode: decodeURIComponent });
+  console.log("Serving resource '" + req.path + "' ...");
+
+  const matchZones = match("/:fnName/homes/:homeId/zones", { decode: decodeURIComponent });
   const matchZonesOnPath = matchZones(req.path);
-  console.log("MatchZones", matchZonesOnPath);
+  console.log("MatchZones - StyleOne", matchZonesOnPath);
 
-  const matchZoneDetails = match("/homes/:homeId/zone/:zoneId", { decode: decodeURIComponent });
+  const matchZones2 = match("/homes/:homeId/zones", { decode: decodeURIComponent });
+  const matchZonesOnPath2 = matchZones2(req.path);
+  console.log("MatchZones", matchZonesOnPath2);
+
+  const matchZoneDetails = match("/:fnName/homes/:homeId/zone/:zoneId", { decode: decodeURIComponent });
   const matchZoneDetailsOnPath = matchZoneDetails(req.path);
-  console.log("MatchZoneDetails", matchZoneDetailsOnPath);
+  console.log("MatchZoneDetails - StyleOne", matchZoneDetailsOnPath);
 
-  if (matchZonesOnPath) {
+  const matchZoneDetails2 = match("/homes/:homeId/zone/:zoneId", { decode: decodeURIComponent });
+  const matchZoneDetailsOnPath2 = matchZoneDetails2(req.path);
+  console.log("MatchZoneDetails", matchZoneDetailsOnPath2);
+
+  if (matchZonesOnPath || matchZonesOnPath2) {
     console.log("Going with zones");
     var keys = [];
-    var re = pathToRegexp('/homes/:homeId/zones', keys, { strict: false });
+    const re = pathToRegexp(((matchZonesOnPath) ? '/:fnName/homes/:homeId/zones' : '/homes/:homeId/zones'), keys, { strict: false });
     var pathVars = re.exec(req.path);
     //console.log("This is the compiled regex result", pathVars);
     if (pathVars) {
-      console.log(JSON.stringify(pathVars));
-      var homeId = pathVars[1];
+      const homeId = (matchZonesOnPath) ? pathVars[2] : pathVars[1];
+      if(matchZonesOnPath) { console.log("I'm a cloud-function and my name is '" + pathVars[1] + "'"); }
       console.log("Working on HOME ", homeId);
 
       try {
@@ -49,16 +59,16 @@ exports.mthMonitoring = (req, res) => {
         });
       }
     }
-  } else if(matchZoneDetailsOnPath) {
+  } else if (matchZoneDetailsOnPath || matchZoneDetailsOnPathS2) {
     console.log("Going with zone details");
     var keys = [];
-    var re = pathToRegexp('/homes/:homeId/zone/:zoneId', keys, { strict: false });
+    const re = pathToRegexp(((matchZoneDetailsOnPath) ? '/:fnName/homes/:homeId/zone/:zoneId':'/homes/:homeId/zone/:zoneId'), keys, { strict: false });
     var pathVars = re.exec(req.path);
     //console.log("This is the compiled regex result", pathVars);
     if (pathVars) {
-      //console.log(JSON.stringify(pathVars));
-      var homeId = pathVars[1];
-      var zoneId = pathVars[2];
+      const homeId = (matchZoneDetailsOnPath) ? pathVars[2] : pathVars[1];
+      const zoneId = (matchZoneDetailsOnPath) ? pathVars[3] : pathVars[2];
+      if(matchZoneDetailsOnPath) { console.log("I'm a cloud-function and my name is '" + pathVars[1] + "'"); }
       console.log("Working on HOME " + homeId + ", ZONE " + zoneId);
 
       try {
